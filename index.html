@@ -1,0 +1,47 @@
+<!-- cat > templates/index.html << 'EOF' --> 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App del Clima</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
+</head>
+<body>
+  <h1>🌦️ App del Clima</h1>
+  <div class="card">
+    <input id="ciudad" type="text" placeholder="Ingresá una ciudad">
+    <button onclick="buscarClima()">Consultar</button>
+    <div id="resultado"></div>
+  </div>
+
+  <script>
+    async function buscarClima() {
+      const ciudad = document.getElementById("ciudad").value.trim();
+      if (!ciudad) {
+        document.getElementById("resultado").innerHTML = "⚠️ Ingresá una ciudad.";
+        return;
+      }
+
+      try {
+        const resp = await fetch(`/clima?ciudad=${encodeURIComponent(ciudad)}`);
+        const data = await resp.json();
+
+        if (resp.ok) {
+          document.getElementById("resultado").innerHTML = `
+            <h3>${data.ciudad}</h3>
+            <p>🌡️ Temperatura: ${data.temp}°C</p>
+            <p>☁️ ${data.descripcion}</p>
+          `;
+        } else {
+          document.getElementById("resultado").innerHTML = `❌ ${data.error}`;
+        }
+      } catch (error) {
+        document.getElementById("resultado").innerHTML = "⚠️ Error al conectar con el servidor.";
+      }
+    }
+  </script>
+</body>
+</html>
+
+<!-- EOF --> 

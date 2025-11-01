@@ -1,0 +1,49 @@
+/* cat > static/css/estilo.css << 'EOF' */
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  margin: 0;
+}
+.card {
+  background: white;
+  border-radius: 15px;
+  padding: 30px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 320px;
+}
+h1 {
+  margin-bottom: 20px;
+}
+input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  width: 80%;
+  margin-bottom: 10px;
+  text-align: center;
+}
+button {
+  background: #4A90E2;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+button:hover {
+  background: #357ABD;
+}
+#resultado {
+  margin-top: 15px;
+}
+
+/*EOF */
