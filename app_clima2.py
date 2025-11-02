@@ -1,10 +1,10 @@
-# cat > app_clima2.py << 'EOF'
+import os
 from flask import Flask, render_template, request, jsonify
 import requests
 
 app = Flask(__name__)
 
-API_KEY = "294a6fd88df66911602849917fba4007"  
+API_KEY = os.getenv("WEATHER_API_KEY")
 
 
 @app.route("/")
