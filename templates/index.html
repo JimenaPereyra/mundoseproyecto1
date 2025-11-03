@@ -37,6 +37,7 @@
           document.getElementById("resultado").innerHTML = `❌ ${data.error}`;
         }
       } catch (error) {
+        console.error ("Error en Fetch", error);
         document.getElementById("resultado").innerHTML = "⚠️ Error al conectar con el servidor.";
       }
     }
@@ -44,4 +45,3 @@
 </body>
 </html>
 
-<!-- EOF --> 
