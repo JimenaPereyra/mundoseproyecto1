@@ -15,5 +15,7 @@ pip install requests
 
 pip3 install -r requirements.txt
 
+Se deben agregar todas las versiones de requirements.
+
 
 
