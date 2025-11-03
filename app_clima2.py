@@ -1,8 +1,13 @@
 import os
 from flask import Flask, render_template, request, jsonify
+from  flask_wtf.csrf import  CSRFProtect
 import requests
 
 app = Flask(__name__)
+
+app.config['SECRET_KEY']=os.environ.get('SECRET_KEY', 'CSRF_key')
+
+csrf = CSRFprotect(app)
 
 API_KEY = os.getenv("WEATHER_API_KEY")
 
@@ -35,4 +40,4 @@ def clima():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-# EOF
+
