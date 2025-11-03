@@ -5,9 +5,9 @@ import requests
 
 app = Flask(__name__)
 
-app.config['APP_KEY']=os.environ['SECRET_KEY']
+app.config['SECRET_KEY']=os.environ['SECRET_KEY'] #NOSONAR
 
-csrf = CSRFprotect(app)
+csrf = CSRFProtect(app)
 
 API_KEY = os.getenv("WEATHER_API_KEY")
 
