@@ -36,7 +36,8 @@ jobs:
 
 
       - name: Ejecutar tests
-        run: pytest -v || exit 1
+        run: |
+          ./.venv/bin/python -m pytest -v || exit 1
 
        # Escaneo con sonar       
       - name: SonarCloud Scan
