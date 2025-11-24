@@ -1,0 +1,86 @@
+name: CI/CD - App Clima2
+
+permissions:
+  contents: read
+  packages: write
+  security-events: write
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-test-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Clonar el repositorio
+      - name: Checkout codigo
+        uses: actions/checkout@v4
+
+      # Configurar Python
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Instalar dependencias y testear
+      - name: Instalar dependencias
+        run: |
+          python3 -m venv .venv
+          source .venv/bin/activate
+          python3 -m pip install --upgrade pip
+          pip install --no-cache-dir -r requirements.txt
+
+
+      - name: Ejecutar tests
+        run: pytest -v || exit 1
+
+       # Escaneo con sonar       
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          organization: JimenaPereyra
+          projectKey: JimenaPereyra_mundoseproyecto1        
+
+      # Login a Docker Hub
+      - name: Login a Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Build y Push de imagen
+      - name: Build y Push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/app_clima2:latest
+
+      # Instalar Syft para SBOM
+      - name: Install Syft
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh
+
+      # Generar SBOM desde la imagen Docker
+      - name: Generate SBOM with Syft
+        run: |
+          syft ${{ secrets.DOCKERHUB_USERNAME }}/app_clima2:latest -o cyclonedx-json > sbom_syft.json
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom_syft
+          path: sbom_syft.json
+
+      # Analisis de seguridad con Snyk
+      - name: Snyk Security Scan
+        uses: snyk/actions/python@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        continue-on-error: true
