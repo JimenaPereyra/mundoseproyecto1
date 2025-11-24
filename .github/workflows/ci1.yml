@@ -50,7 +50,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           organization: JimenaPereyra
-          projectKey: JimenaPereyra_mundoseproyecto1        
+          projectKey: JimenaPereyra_mundoseproyecto1
 
       # Login a Docker Hub
       - name: Login a Docker Hub
