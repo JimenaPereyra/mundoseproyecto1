@@ -48,9 +48,6 @@ jobs:
         uses: SonarSource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          organization: JimenaPereyra
-          projectKey: JimenaPereyra_mundoseproyecto1
 
       # Login a Docker Hub
       - name: Login a Docker Hub
