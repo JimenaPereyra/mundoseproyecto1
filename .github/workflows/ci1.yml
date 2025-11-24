@@ -67,7 +67,7 @@ jobs:
       # Instalar Syft para SBOM
       - name: Install Syft
         run: |
-          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh
+          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b/usr/local/bin
 
       # Generar SBOM desde la imagen Docker
       - name: Generate SBOM with Syft
