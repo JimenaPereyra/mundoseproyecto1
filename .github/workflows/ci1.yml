@@ -49,6 +49,19 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+      # Reporte para sonar
+      - name: Descargar reporte SonarCloud (SARIF)
+        run: |
+          curl -u "${{ secrets.SONAR_TOKEN }}:" \
+          "https://sonarcloud.io/api/issues/search?componentKeys=JimenaPereyra_mundoseproyecto1&types=VULNERABILITY,BUG,CODE_SMELL&ps=500" \
+          -o sonar_report.json
+
+      - name: Subir artifact reporte SonarCloud
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonar_report
+          path: sonar_report.json
+
       # Login a Docker Hub
       - name: Login a Docker Hub
         uses: docker/login-action@v3
@@ -65,12 +78,12 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/app_clima2:latest
 
       # Instalar Syft para SBOM
-      - name: Install Syft
+      - name: Instalar Syft
         run: |
           curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b/usr/local/bin
 
       # Generar SBOM desde la imagen Docker
-      - name: Generate SBOM with Syft
+      - name: Generar SBOM con Syft
         run: |
           syft ${{ secrets.DOCKERHUB_USERNAME }}/app_clima2:latest -o cyclonedx-json > sbom_syft.json
 
