@@ -45,7 +45,7 @@ jobs:
 
        # Escaneo con sonar       
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@d08d592c0b694607865c089cba90bbf87c9a6d89
+        uses: SonarSource/sonarcloud-github-action@d08d592c0b694607865c089cba90bbf87c9a6d89  #v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
@@ -64,7 +64,7 @@ jobs:
 
       # Login a Docker Hub
       - name: Login a Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef #v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
