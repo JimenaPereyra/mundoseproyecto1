@@ -5,7 +5,7 @@ import requests
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY']=os.environ['SECRET_KEY'] #NOSONAR
+app.config['SECRET_KEY']=os.getenv('SECRET_KEY', 'test-secret-key') #NOSONAR
 
 csrf = CSRFProtect(app)
 
