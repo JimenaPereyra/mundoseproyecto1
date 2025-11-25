@@ -35,15 +35,21 @@ jobs:
           pip install --no-cache-dir -r requirements.txt
           pip install --no-cache-dir -r requirements-dev.txt
 
-      - name: Ejecutar tests
+   #   - name: Ejecutar tests
+   #     run: |
+   #       if ./.venv/bin/python -m pytest -v; then
+   #          echo "Tests OK"
+   #       else
+   #          echo "No hay tests - Se continua"
+   #       fi
+     #Ejecutar tests con coverage
+      - name: Ejecutar tests con coverage
         run: |
-          if ./.venv/bin/python -m pytest -v; then
-             echo "Tests OK"
-          else
-             echo "No hay tests - Se continua"
-          fi
+         source .venv/bin/activate
+         coverage run -m pytest
+         coverage xml
 
-       # Escaneo con sonar       
+       # Escaneo con sonar
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@d08d592c0b694607865c089cba90bbf87c9a6d89  #v2
         env:
