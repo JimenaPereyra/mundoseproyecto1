@@ -50,9 +50,13 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       # Reporte para sonar
+
+
       - name: Descargar reporte SonarCloud (SARIF)
-        run: |
-          curl -u "${{ secrets.SONAR_TOKEN }}:" \
+        env:
+          SONAR_TOKEN:${{ secrets.SONAR_TOKEN }}
+          run: |
+          curl -u "$SONAR_TOKEN:" \
           "https://sonarcloud.io/api/issues/search?componentKeys=JimenaPereyra_mundoseproyecto1&types=VULNERABILITY,BUG,CODE_SMELL&ps=500" \
           -o sonar_report.json
 
