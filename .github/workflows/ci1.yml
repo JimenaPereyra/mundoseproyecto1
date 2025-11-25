@@ -50,8 +50,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       # Reporte para sonar
-
-
       - name: Descargar reporte SonarCloud (SARIF)
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -88,8 +86,10 @@ jobs:
 
       # Generar SBOM desde la imagen Docker
       - name: Generar SBOM con Syft
+        env:
+         DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
-          syft ${{ secrets.DOCKERHUB_USERNAME }}/app_clima2:latest -o cyclonedx-json > sbom_syft.json
+          syft "$DOCKERHUB_USER/app_clima2:latest" -o cyclonedx-json > sbom_syft.json
 
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@v4
