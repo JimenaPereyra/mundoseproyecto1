@@ -89,7 +89,7 @@ jobs:
         env:
          DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
-          syft "$DOCKERHUB_USER/app_clima2:latest" -o cyclonedx-json > sbom_syft.json
+          syft "$DOCKER_USER/app_clima2:latest" -o cyclonedx-json > sbom_syft.json
 
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@v4
