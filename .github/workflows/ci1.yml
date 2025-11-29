@@ -10,16 +10,18 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
+env:
+  IMAGE_NAME: app_clima2
 jobs:
   build-test-publish:
     runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{steps.set-tag.outputs.IMAGE_TAG}}
 
     steps:
       # Clonar el repositorio
       - name: Checkout codigo
         uses: actions/checkout@v4
-
       # Configurar Python
       - name: Configurar Python
         uses: actions/setup-python@v5
@@ -48,6 +50,12 @@ jobs:
          source .venv/bin/activate
          coverage run -m pytest
          coverage xml
+      - name: Agrego TAG
+        id: set-tag
+        run: |
+         TAG=${GITHUB_SHA::8}
+         echo "IMAGE_TAG=$TAG" >> $GITHUB_ENV
+         echo "::set-output name=IMAGE_TAG::$TAG"
 
        # Escaneo con sonar
       - name: SonarCloud Scan
@@ -83,7 +91,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/app_clima2:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
       # Instalar Syft para SBOM
       - name: Instalar Syft
@@ -95,7 +103,7 @@ jobs:
         env:
          DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
-          syft "$DOCKER_USER/app_clima2:latest" -o cyclonedx-json > sbom_syft.json
+          syft "$DOCKER_USER/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}" -o cyclonedx-json > sbom_syft.json
 
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@v4
@@ -108,4 +116,10 @@ jobs:
         uses: snyk/actions/python@9adf32b1121593767fc3c057af55b55db032dc04
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        continue-on-error: true
+        run: |
+          pip install snyk || true
+          snyk auth $SNYK_TOKEN || true
+          # scan dependencies
+          if [ -f requirements.txt ]; then snyk test --file=requirements.txt || true; fi
+          # scan the published image
+          snyk container test ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} || true
