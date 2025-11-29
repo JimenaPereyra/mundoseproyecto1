@@ -113,7 +113,7 @@ jobs:
 
       # Analisis de seguridad con Snyk
       - name: Snyk Security Scan
-        uses: snyk/actions/docker@master
+        uses: snyk/actions/docker@ff5c02a0e3adc5c52e2c9e7558edf2b46d69ac1f #master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
