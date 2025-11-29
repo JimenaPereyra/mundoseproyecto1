@@ -121,7 +121,8 @@ jobs:
           command: test
           args: --severity-threshold=high
           sarif: false
- deploy:
+
+  deploy:
     name: Terraform deploy to AWS (EC2)
     runs-on: ubuntu-latest
     needs: build-test-publish
