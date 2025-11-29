@@ -116,10 +116,5 @@ jobs:
         uses: snyk/actions/python@9adf32b1121593767fc3c057af55b55db032dc04
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        run: |
-          pip install snyk || true
-          snyk auth $SNYK_TOKEN || true
-          # scan dependencies
-          if [ -f requirements.txt ]; then snyk test --file=requirements.txt || true; fi
-          # scan the published image
-          snyk container test ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} || true
+        with:
+          image: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
