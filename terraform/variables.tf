@@ -30,3 +30,8 @@ variable "ami_id" {
   default     = "ami-0c398cb65a93047f2"
 }
 
+variable "ssh_public_key" {
+  description = "Clave pública para la Key Pair"
+  type        = string
+}
+
