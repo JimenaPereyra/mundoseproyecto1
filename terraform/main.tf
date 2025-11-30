@@ -54,12 +54,15 @@ resource "aws_security_group" "sg" {
     protocol = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+
+  ingress {
+    from_port = 3000
+    to_port   = 3000
+    protocol  = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
-
-
-
-
-
 resource "aws_instance" "app" {
   ami = var.ami_id
   instance_type = var.instance_type
