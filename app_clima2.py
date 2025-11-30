@@ -158,14 +158,15 @@ def health():
 @app.route("/clima", methods=["GET"])
 def clima():
 
-    REQUEST_COUNT.labels(endpoint=endpoint, method="GET").inc()
+    REQUEST_COUNT.labels(endpoint=request.endpoint,method=request.method).inc()
     start_request = time.perf_counter()
 
     ciudad = request.args.get("ciudad")
     if not ciudad:
-        REQUEST_ERRORS.labels(endpoint=endpoint, type="missing_city").inc()
+
+	REQUEST_ERRORS.labels(endpoint=request.endpoint, type="missing_city").inc()
         duration = time.perf_counter() - start_request
-        REQUEST_LATENCY.labels(endpoint=endpoint).observe(duration)
+        REQUEST_LATENCY.labels(endpoint=request.endpoint).observe(duration)
 
         return jsonify({"error": "Debe ingresar una ciudad"}), 400
 
