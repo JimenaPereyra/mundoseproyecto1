@@ -177,3 +177,57 @@ jobs:
         with:
           name: terraform-outputs
           path: tf_outputs.json
+      - name: Install Node (for puppeteer screenshot)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install puppeteer and take screenshot of Grafana
+        env:
+          INSTANCE_IP: ${{ steps.terraform.outputs.instance_public_ip }}
+          GRAFANA_PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+        run: |
+          npm init -y
+          npm install puppeteer@19.11.1
+
+          cat > capture.js <<'JS'
+          const puppeteer = require('puppeteer');
+
+          (async () => {
+            const ip = process.env.INSTANCE_IP;
+            const password = process.env.GRAFANA_PASSWORD;
+
+            const browser = await puppeteer.launch({
+              args: ['--no-sandbox','--disable-setuid-sandbox']
+            });
+
+            const page = await browser.newPage();
+            const url = `http://${ip}:3000/login`;
+
+            console.log("Abriendo Grafana:", url);
+            await page.goto(url, { waitUntil: 'networkidle2' });
+
+            await page.type('input[name="user"]', 'admin');
+            await page.type('input[name="password"]', password);
+            await page.click('button[type="submit"]');
+
+            await page.waitForNavigation({ waitUntil: 'networkidle2' });
+
+            const dash = `http://${ip}:3000/d/clima-dashboard/clima`;
+            await page.goto(dash, { waitUntil: 'networkidle2' });
+
+            await page.setViewport({ width: 1600, height: 900 });
+            await page.screenshot({ path: 'grafana_screenshot.png' });
+
+            console.log("Screenshot generado.");
+            await browser.close();
+          })();
+          JS
+
+          node capture.js
+
+      - name: Upload Grafana screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: grafana_dashboard
+          path: grafana_screenshot.png

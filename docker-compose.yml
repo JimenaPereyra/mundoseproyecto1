@@ -6,6 +6,7 @@ services:
     restart: always
     environment:
       - WEATHER_API_KEY=${WEATHER_API_KEY}
+      - SECRET_KEY=${SECRET_KEY}
     ports:
       - "80:5000"
     networks:
@@ -17,24 +18,12 @@ services:
         max-size: "10m"
         max-file: "3"
 
-  cadvisor:
-    image: google/cadvisor:latest
-    restart: always
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-    ports:
-      - "8080:8080"
-    networks:
-      - monitoring
 
   prometheus:
     image: prom/prometheus:latest
     restart: always
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
     networks:
@@ -48,7 +37,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
     networks:
       - monitoring
 
