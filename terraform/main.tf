@@ -57,13 +57,7 @@ resource "aws_security_group" "sg" {
 }
 
 
-resource "aws_key_pair" "deployed__key" {
-  key_name   = var.key_name
-  public_key = var.ssh_public_key
-  tags = {
-    Name = var.key_name
-  }
-}
+
 
 
 resource "aws_instance" "app" {
@@ -72,7 +66,7 @@ resource "aws_instance" "app" {
   subnet_id = aws_subnet.public.id
   associate_public_ip_address = true
   vpc_security_group_ids = [aws_security_group.sg.id]
-  key_name = aws_key_pair.deployed__key.key_name
+  key_name = proyectofinal
 
   user_data = <<-EOF
     #!/bin/bash
