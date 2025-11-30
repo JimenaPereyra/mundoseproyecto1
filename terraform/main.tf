@@ -56,14 +56,10 @@ resource "aws_security_group" "sg" {
   }
 }
 
-# Generar clave SSH automáticamente
-resource "tls_private_key" "pin_key_pair" {
-  algorithm = "RSA"
-  rsa_bits  = 2048
-}
+
 resource "aws_key_pair" "pin_key" {
   key_name   = "pin-clave-ssh"
-  public_key = tls_private_key.pn_key_pair.public_key_openssh
+  public_key = var.ssh_public_key
   tags = {
     Name = "pin-clave-ssh"
   }
