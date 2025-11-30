@@ -150,16 +150,21 @@ jobs:
         working-directory: ./terraform
         run: terraform init
 
+
       - name: Terraform Plan
         working-directory: ./terraform
-        run: terraform plan -out=tfplan -var "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }}" -var "image_tag=${{ needs.outputs.image-tag }}"
+        run: |
+          terraform plan -out=tfplan \
+            -var "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }}" \
+            -var "image_tag=${{ needs.build-test-publish.outputs.image-tag }}" \
+            -var "ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" \
+            -var "weather_api_key=${{ secrets.WEATHER_API_KEY }}"
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
         working-directory: ./terraform
-        env:
-          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
-        run: terraform apply -auto-approve -var "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }}" -var "image_tag=${{ needs.outputs.image-tag }}" -var "weather_api_key=${{ secrets.WEATHER_API_KEY }}"
+        run: |
+          terraform apply -auto-approve tfplan
 
       - name: Output instance info
         if: github.ref == 'refs/heads/main'
