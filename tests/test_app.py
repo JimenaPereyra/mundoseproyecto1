@@ -27,7 +27,7 @@ def test_clima_ciudad_no_encontrada(client, monkeypatch):
         def json(self):
             return {"message": "city not found"}
 
-    monkeypatch.setattr(requests, "get", lambda url: MockResponse())
+    monkeypatch.setattr(requests, "get", lambda url, *args, **kwargs: MockResponse())
 
     response = client.get("/clima?ciudad=Desconocida")
     assert response.status_code == 404
@@ -47,7 +47,7 @@ def test_clima_exito(client, monkeypatch):
                 "weather": [{"description": "cielo despejado"}],
             }
 
-    monkeypatch.setattr(requests, "get", lambda url: MockResponse())
+    monkeypatch.setattr(requests, "get", lambda url, *args, **kwargs: MockResponse())
 
     response = client.get("/clima?ciudad=Buenos Aires")
     assert response.status_code == 200
