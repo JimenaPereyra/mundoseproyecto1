@@ -179,7 +179,7 @@ def clima():
         update_city_metrics(ciudad_norm)
         temperature_gauge.labels(city=ciudad_norm).set(cached_temp)
         duration = time.perf_counter() - start_request
-        REQUEST_LATENCY.labels(endpoint=endpoint).observe(duration)
+        REQUEST_LATENCY.labels(endpoint=request.endpoint).observe(duration)
         payload = {"ciudad": ciudad_norm, "temp": cached_temp, "cached": True}
         PAYLOAD_SIZE.observe(len(json.dumps(payload).encode("utf-8")))
         return jsonify(payload)
@@ -194,9 +194,9 @@ def clima():
         resp = requests.get(url, timeout=15)
     except requests.RequestException as e:
         # Error de conexión/timeout al llamar OpenWeather
-        REQUEST_ERRORS.labels(endpoint=endpoint, type="openweather_connection").inc()
+        REQUEST_ERRORS.labels(endpoint=request.endpoint, type="openweather_connection").inc()
         duration = time.perf_counter() - start_request
-        REQUEST_LATENCY.labels(endpoint=endpoint).observe(duration)
+        REQUEST_LATENCY.labels(endpoint=request.endpoint).observe(duration)
         return jsonify({"error": "Error al conectar con el servicio de clima"}), 502
     openw_duration = time.perf_counter() - openw_start
     api_latency.observe(openw_duration)
@@ -205,15 +205,15 @@ def clima():
     try:
         datos = resp.json()
     except ValueError:
-        REQUEST_ERRORS.labels(endpoint=endpoint, type="openweather_bad_json").inc()
+        REQUEST_ERRORS.labels(endpoint=request.endpoint, type="openweather_bad_json").inc()
         duration = time.perf_counter() - start_request
-        REQUEST_LATENCY.labels(endpoint=endpoint).observe(duration)
+        REQUEST_LATENCY.labels(endpoint=request.endpoint).observe(duration)
         return jsonify({"error": "Respuesta inválida del servicio de clima"}), 502
 
     if resp.status_code != 200:
-        REQUEST_ERRORS.labels(endpoint=endpoint, type="openweather_status").inc()
+        REQUEST_ERRORS.labels(endpoint=request.endpoint, type="openweather_status").inc()
         duration = time.perf_counter() - start_request
-        REQUEST_LATENCY.labels(endpoint=endpoint).observe(duration)
+        REQUEST_LATENCY.labels(endpoint=request.endpoint).observe(duration)
         return jsonify({"error": "Ciudad no encontrada"}), 404
 
     temp = datos.get("main", {}).get("temp")
@@ -227,7 +227,7 @@ def clima():
     # actualizar métricas de ciudad y request
     update_city_metrics(ciudad_norm)
     duration = time.perf_counter() - start_request
-    REQUEST_LATENCY.labels(endpoint=endpoint).observe(duration)
+    REQUEST_LATENCY.labels(endpoint=request.endpoint).observe(duration)
 
     resultado = {
         "ciudad": nombre,
