@@ -195,6 +195,28 @@ jobs:
           done
           echo "EC2 not ready after waiting."
           exit 1
+      - name: Wait for Docker inside EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.EC2_IP }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          script: |
+            echo "Waiting for Docker to be ready..."
+            for i in {1..15}; do
+              if command -v docker >/dev/null 2>&1; then
+                echo "Docker installed!"
+                # Check if Docker daemon is running
+                if sudo docker info >/dev/null 2>&1; then
+                  echo "Docker daemon is ready!"
+                  exit 0
+                fi
+              fi
+              echo "Docker not ready yet, retrying..."
+              sleep 10
+            done
+            echo "Docker did not become ready in time"
+            exit 1
 
       - name: Start Grafana on EC2
         uses: appleboy/ssh-action@v1.0.3
