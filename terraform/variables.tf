@@ -31,7 +31,13 @@ variable "ami_id" {
 }
 
 variable "ssh_public_key" {
-  description = "Clave pública para la Key Pair"
+  description = "Clave pública para EC2"
   type        = string
+}
+
+variable "key_name" {
+  description = "Nombre del key pair que se registrará en AWS"
+  type        = string
+  default     = "proyectofinal"
 }
 
