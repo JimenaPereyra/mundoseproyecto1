@@ -164,7 +164,7 @@ def clima():
     ciudad = request.args.get("ciudad")
     if not ciudad:
 
-	REQUEST_ERRORS.labels(endpoint=request.endpoint, type="missing_city").inc()
+        REQUEST_ERRORS.labels(endpoint=request.endpoint, type="missing_city").inc()
         duration = time.perf_counter() - start_request
         REQUEST_LATENCY.labels(endpoint=request.endpoint).observe(duration)
 
