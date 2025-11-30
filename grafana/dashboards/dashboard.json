@@ -1,0 +1,151 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "clima-dashboard",
+    "title": "Clima App - Observabilidad",
+    "timezone": "browser",
+    "schemaVersion": 36,
+    "version": 1,
+    "refresh": "10s",
+
+    "panels": [
+
+      {
+        "type": "stat",
+        "title": "Total Requests",
+        "id": 1,
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sum(app_requests_total)",
+            "legendFormat": "Total Requests"
+          }
+        ]
+      },
+
+      {
+        "type": "graph",
+        "title": "Requests por endpoint",
+        "id": 2,
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sum by (endpoint) (app_requests_total)",
+            "legendFormat": "{{endpoint}}"
+          }
+        ]
+      },
+
+      {
+        "type": "graph",
+        "title": "Latencia por endpoint",
+        "id": 3,
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum by (le, endpoint) (rate(app_request_latency_seconds_bucket[5m])))",
+            "legendFormat": "{{endpoint}} P95"
+          }
+        ]
+      },
+
+      {
+        "type": "graph",
+        "title": "Latencia OpenWeather API",
+        "id": 4,
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum by (le) (rate(clima_openweather_latency_seconds_bucket[5m])))",
+            "legendFormat": "OpenWeather P95"
+          }
+        ]
+      },
+
+      {
+        "type": "graph",
+        "title": "Última temperatura consultada",
+        "id": 5,
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "clima_last_temperature",
+            "legendFormat": "{{city}}"
+          }
+        ]
+      },
+
+      {
+        "type": "stat",
+        "title": "Ciudad más consultada",
+        "id": 6,
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "app_city_most_queried",
+            "legendFormat": "Ciudad más consultada"
+          }
+        ]
+      },
+
+      {
+        "type": "graph",
+        "title": "Consultas por ciudad",
+        "id": 7,
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sum by (city) (app_city_queries_total)",
+            "legendFormat": "{{city}}"
+          }
+        ]
+      },
+
+      {
+        "type": "graph",
+        "title": "Cache Hits vs Misses",
+        "id": 8,
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(clima_cache_hits_total[5m])",
+            "legendFormat": "Cache Hits"
+          },
+          {
+            "expr": "rate(clima_cache_misses_total[5m])",
+            "legendFormat": "Cache Misses"
+          }
+        ]
+      },
+
+      {
+        "type": "graph",
+        "title": "Payload (bytes)",
+        "id": 9,
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "rate(app_response_payload_bytes_sum[5m])",
+            "legendFormat": "Bytes/sec"
+          }
+        ]
+      },
+
+      {
+        "type": "stat",
+        "title": "Healthchecks ejecutados",
+        "id": 10,
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sum(clima_health_checks_total)",
+            "legendFormat": "Health Checks"
+          }
+        ]
+      }
+
+    ]
+  },
+
+  "overwrite": true
+}
