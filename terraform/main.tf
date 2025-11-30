@@ -85,7 +85,7 @@ resource "aws_instance" "app" {
       -e SECRET_KEY="${var.weather_api_key}" \
       -e WEATHER_API_KEY="${var.weather_api_key}" \
       --name clima-app ${var.dockerhub_username}/app_clima2:${var.image_tag}
-    usermod -aG docker ubuntu
+    sudo usermod -aG docker ubuntu
   EOF
 
   tags = { Name = "clima-app-instance" }
