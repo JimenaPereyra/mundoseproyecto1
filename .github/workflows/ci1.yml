@@ -166,6 +166,10 @@ jobs:
         run: |
           terraform apply -auto-approve tfplan
 
+      - name: Get EC2 IP from Terraform
+        id: ec2_ip
+        run: echo "EC2_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
+        working-directory: infraestructura
       - name: Output instance info
         if: github.ref == 'refs/heads/main'
         working-directory: ./terraform
@@ -177,13 +181,14 @@ jobs:
         with:
           name: terraform-outputs
           path: tf_outputs.json
+
       - name: Start Grafana on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ec2-user
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-             docker stop grafana || true
-             docker rm grafana || true
-             docker run -d -p 3000:3000 --name grafana grafana/grafana:latest
+        host: ${{ env.EC2_IP }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+           docker stop grafana || true
+           docker rm grafana || true
+           docker run -d -p 3000:3000 --name grafana grafana/grafana:latest
