@@ -182,6 +182,20 @@ jobs:
           name: terraform-outputs
           path: tf_outputs.json
 
+      - name: Wait for EC2 SSH to be ready
+        run: |
+          echo "Waiting for EC2 to accept SSH..."
+          for i in {1..15}; do
+            if nc -zv $EC2_IP 22; then
+              echo "SSH is ready!"
+              exit 0
+            fi
+            echo "Retrying in 10 seconds..."
+            sleep 10
+          done
+          echo "EC2 not ready after waiting."
+          exit 1
+
       - name: Start Grafana on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
