@@ -177,9 +177,13 @@ jobs:
         with:
           name: terraform-outputs
           path: tf_outputs.json
-      - name: Run Grafana
-        run: |
-          echo "Iniciando Grafana"
-          docker run -d -p 3000:3000 --name grafana grafana/grafana:latest
-          echo "Grafana disponible en: http://localhost:3000"
-          echo "Ingresá con: user=admin / pass=admin"
+      - name: Start Grafana on EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ec2-user
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+             docker stop grafana || true
+             docker rm grafana || true
+             docker run -d -p 3000:3000 --name grafana grafana/grafana:latest
