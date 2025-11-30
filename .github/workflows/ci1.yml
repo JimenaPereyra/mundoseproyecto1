@@ -187,7 +187,7 @@ jobs:
         with:
           host: ${{ env.EC2_IP }}
           username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
             docker stop grafana || true
             docker rm grafana || true
