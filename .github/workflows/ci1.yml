@@ -228,23 +228,31 @@ jobs:
             sudo docker stop grafana || true
             sudo docker rm grafana || true
             sudo docker run -d -p 3000:3000 --name grafana grafana/grafana:latest
+
       - name: Start Prometheus on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ env.EC2_IP }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          env:
+            PROMETHEUS_YML_CONTENT: ${{ secrets.PROMETHEUS_YML_CONTENT }}
           script: |
-             echo ">>> Copy prometheus.yml to EC2"
-             cat << 'EOF' > prometheus.yml
-             ${PROMETHEUS_YML_CONTENT}
-             EOF
+            echo ">>> Creating prometheus.yml on EC2"
+            cat << 'EOF' > /home/ubuntu/prometheus.yml
+                ${PROMETHEUS_YML_CONTENT}
+                EOF
 
-             sudo docker stop prometheus || true
-             sudo docker rm prometheus || true
+            echo ">>> Stopping existing Prometheus container if exists"
+            sudo docker stop prometheus || true
+            sudo docker rm prometheus || true
 
-             sudo docker run -d \
-             -p 9090:9090 \
-             -v $(pwd)/prometheus.yml:/etc/prometheus/prometheus.yml \
-             --name prometheus \
-             prom/prometheus:latest
+            echo ">>> Running Prometheus container"
+            sudo docker run -d \
+              --name prometheus \
+              -p 9090:9090 \
+              -v /home/ubuntu/prometheus.yml:/etc/prometheus/prometheus.yml \
+              prom/prometheus:latest
+
+            echo ">>> Verifying Prometheus container"
+            sudo docker ps | grep prometheus
