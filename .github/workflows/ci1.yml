@@ -237,7 +237,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
             echo ">>> Copy prometheus.yml to EC2"
-cat << 'EOF' > /home/ubuntu/prometheus.yml
+            cat << 'EOF' > /home/ubuntu/prometheus.yml
 global:
   scrape_interval: 15s
 
