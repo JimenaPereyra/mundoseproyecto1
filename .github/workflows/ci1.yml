@@ -251,18 +251,18 @@ jobs:
 
             echo ">>> Copy docker-compose-prometheus.yml to EC2"
             cat << 'EOF' > /home/ubuntu/docker-compose-prometheus.yml
-version: "3.9"
+         version: "3.9"
 
-services:
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    restart: always
-   EOF
+         services:
+         prometheus:
+         image: prom/prometheus:latest
+         container_name: prometheus
+         ports:
+             - "9090:9090"
+         volumes:
+             - ./prometheus.yml:/etc/prometheus/prometheus.yml
+         restart: always
+           EOF
 
-      sudo docker-compose -f /home/ubuntu/docker-compose-prometheus.yml down || true
-      sudo docker-compose -f /home/ubuntu/docker-compose-prometheus.yml up -d
+           sudo docker-compose -f /home/ubuntu/docker-compose-prometheus.yml down || true
+           sudo docker-compose -f /home/ubuntu/docker-compose-prometheus.yml up -d
