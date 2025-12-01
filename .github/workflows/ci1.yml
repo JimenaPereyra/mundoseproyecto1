@@ -240,7 +240,7 @@ jobs:
           script: |
             echo ">>> Creating prometheus.yml on EC2"
             cat << EOF > /home/ubuntu/prometheus.yml
-${PROMETHEUS_YML_CONTENT}
+$PROMETHEUS_YML_CONTENT
 EOF
 
             echo ">>> Stopping existing Prometheus container if exists"
