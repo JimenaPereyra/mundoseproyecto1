@@ -225,7 +225,7 @@ scrape_configs:
 EOF
 
             echo ">>> Crear docker-compose-prometheus.yml"
-cat << 'EOF' > /home/ubuntu/docker-compose-prometheus.yml
+            cat << 'EOF' > /home/ubuntu/docker-compose-prometheus.yml
 version: "3.9"
 
 services:
@@ -241,5 +241,6 @@ EOF
 
             sudo docker compose -f /home/ubuntu/docker-compose-prometheus.yml down || true
             sudo docker compose -f /home/ubuntu/docker-compose-prometheus.yml up -d
+
 
 
