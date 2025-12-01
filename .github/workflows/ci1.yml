@@ -238,14 +238,15 @@ jobs:
           script: |
             echo ">>> Copy prometheus.yml to EC2"
             cat << 'EOF' > /home/ubuntu/prometheus.yml
-global:
-  scrape_interval: 15s
+  global:
+    scrape_interval: 15s
 
-scrape_configs:
-  - job_name: 'app_clima'
-    static_configs:
-      - targets: ['localhost:8000']
-EOF
+  scrape_configs:
+    - job_name: 'app_clima'
+      static_configs:
+        - targets: ['localhost:8000']
+  EOF
+
 
 
        echo ">>> Copy docker-compose-prometheus.yml to EC2"
