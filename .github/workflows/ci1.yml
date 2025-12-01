@@ -239,7 +239,7 @@ jobs:
             PROMETHEUS_YML_CONTENT: ${{ secrets.PROMETHEUS_YML_CONTENT }}
           script: |
             echo ">>> Creating prometheus.yml on EC2"
-            cat << 'EOF' > /home/ubuntu/prometheus.yml
+            cat << EOF > /home/ubuntu/prometheus.yml
 ${PROMETHEUS_YML_CONTENT}
 EOF
 
