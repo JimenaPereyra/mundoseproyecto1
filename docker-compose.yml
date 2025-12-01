@@ -1,48 +1,11 @@
-version: "3.8"
+version: "3.9"
+
 services:
-
-  app:
-    image: "${DOCKERHUB_USERNAME}/app_clima2:latest"
-    restart: always
-    environment:
-      - WEATHER_API_KEY=${WEATHER_API_KEY}
-      - SECRET_KEY=${SECRET_KEY}
-    ports:
-      - "80:5000"
-    networks:
-      - monitoring
-    user: "1000:1000"    # correr con uid/gid no root (coincidir con Dockerfile user if needed)
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-
   prometheus:
     image: prom/prometheus:latest
-    restart: always
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    container_name: prometheus
     ports:
       - "9090:9090"
-    networks:
-      - monitoring
-
-  grafana:
-    image: grafana/grafana:9.0.0
-    restart: always
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
-    ports:
-      - "3000:3000"
     volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning
-    networks:
-      - monitoring
-
-networks:
-  monitoring:
-
-volumes:
-  grafana-storage:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: always
