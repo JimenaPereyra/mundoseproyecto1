@@ -229,30 +229,38 @@ jobs:
             sudo docker rm grafana || true
             sudo docker run -d -p 3000:3000 --name grafana grafana/grafana:latest
 
-      - name: Start Prometheus on EC2
+      - name: Deploy Prometheus via Docker Compose
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ env.EC2_IP }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          env:
-            PROMETHEUS_YML_CONTENT: ${{ secrets.PROMETHEUS_YML_CONTENT }}
           script: |
-            echo ">>> Creating prometheus.yml on EC2"
-            cat << EOF > /home/ubuntu/prometheus.yml
-$PROMETHEUS_YML_CONTENT
+            echo ">>> Copy prometheus.yml to EC2"
+            cat << 'EOF' > /home/ubuntu/prometheus.yml
+      global:
+        scrape_interval: 15s
+
+      scrape_configs:
+        - job_name: 'app_clima'
+          static_configs:
+            - targets: ['localhost:8000']
 EOF
 
-            echo ">>> Stopping existing Prometheus container if exists"
-            sudo docker stop prometheus || true
-            sudo docker rm prometheus || true
+       echo ">>> Copy docker-compose-prometheus.yml to EC2"
+       cat << 'EOF' > /home/ubuntu/docker-compose-prometheus.yml
+version: "3.9"
 
-            echo ">>> Running Prometheus container"
-            sudo docker run -d \
-              --name prometheus \
-              -p 9090:9090 \
-              -v /home/ubuntu/prometheus.yml:/etc/prometheus/prometheus.yml \
-              prom/prometheus:latest
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: always
+EOF
 
-            echo ">>> Verifying Prometheus container"
-            sudo docker ps | grep prometheus
+      sudo docker-compose -f /home/ubuntu/docker-compose-prometheus.yml down || true
+      sudo docker-compose -f /home/ubuntu/docker-compose-prometheus.yml up -d
