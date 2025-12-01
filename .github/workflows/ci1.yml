@@ -236,27 +236,29 @@ jobs:
               echo ">>> Crear prometheus.yml"
               cat << 'EOF' > /home/ubuntu/prometheus.yml
               global:
-              scrape_interval: 15s
+                scrape_interval: 15s
               scrape_configs:
-              - job_name: 'app_clima'
-              static_configs:
-              - targets: ['localhost:8000']
+                - job_name: 'app_clima'
+                  static_configs:
+                    - targets: ['localhost:8000']
               EOF
               echo ">>> Crear docker-compose-prometheus.yml"
               cat << 'EOF' > /home/ubuntu/docker-compose-prometheus.yml
               version: "3.9"
+              
               services:
-              prometheus:
-              image: prom/prometheus:latest
-              container_name: prometheus
-              ports:
-              - "9090:9090"
-              volumes:
-              - ./prometheus.yml:/etc/prometheus/prometheus.yml
-              restart: always
+                prometheus:
+                  image: prom/prometheus:latest
+                  container_name: prometheus
+                  ports:
+                    - "9090:9090"
+                  volumes:
+                    - ./prometheus.yml:/etc/prometheus/prometheus.yml
+                  restart: always
               EOF
               sudo docker compose -f /home/ubuntu/docker-compose-prometheus.yml down || true
               sudo docker compose -f /home/ubuntu/docker-compose-prometheus.yml up -d
+
 
 
 
