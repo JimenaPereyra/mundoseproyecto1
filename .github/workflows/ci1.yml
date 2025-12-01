@@ -10,25 +10,25 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
 env:
   IMAGE_NAME: app_clima2
-
 jobs:
   build-test-publish:
     runs-on: ubuntu-latest
     outputs:
-      image-tag: ${{ steps.set-tag.outputs.IMAGE_TAG }}
+      image-tag: ${{steps.set-tag.outputs.IMAGE_TAG}}
 
     steps:
+      # Clonar el repositorio
       - name: Checkout codigo
         uses: actions/checkout@v4
-
+      # Configurar Python
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
+      # Instalar dependencias y testear
       - name: Instalar dependencias
         run: |
           python3 -m venv .venv
@@ -37,29 +37,33 @@ jobs:
           pip install --no-cache-dir -r requirements.txt
           pip install --no-cache-dir -r requirements-dev.txt
 
+     #Ejecutar tests con coverage
       - name: Ejecutar tests con coverage
         run: |
-          source .venv/bin/activate
-          coverage run -m pytest
-          coverage xml
-
+         source .venv/bin/activate
+         coverage run -m pytest
+         coverage xml
       - name: Agrego TAG
         id: set-tag
         run: |
-          TAG=${GITHUB_SHA::8}
-          echo "IMAGE_TAG=$TAG" >> $GITHUB_ENV
-          echo "IMAGE_TAG=$TAG" >> $GITHUB_OUTPUT
+         TAG=${GITHUB_SHA::8}
+         echo "IMAGE_TAG=$TAG" >> $GITHUB_ENV
+         echo "::set-output name=IMAGE_TAG::$TAG"
 
+       # Escaneo con sonar
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
+        uses: SonarSource/sonarcloud-github-action@d08d592c0b694607865c089cba90bbf87c9a6d89  #v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+      # Reporte para sonar
       - name: Descargar reporte SonarCloud (SARIF)
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          curl -u "$SONAR_TOKEN:"           "https://sonarcloud.io/api/issues/search?componentKeys=JimenaPereyra_mundoseproyecto1&types=VULNERABILITY,BUG,CODE_SMELL&ps=500"           -o sonar_report.json
+          curl -u "$SONAR_TOKEN:" \
+          "https://sonarcloud.io/api/issues/search?componentKeys=JimenaPereyra_mundoseproyecto1&types=VULNERABILITY,BUG,CODE_SMELL&ps=500" \
+          -o sonar_report.json
 
       - name: Subir artifact reporte SonarCloud
         uses: actions/upload-artifact@v4
@@ -67,26 +71,30 @@ jobs:
           name: sonar_report
           path: sonar_report.json
 
+      # Login a Docker Hub
       - name: Login a Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef #v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # Build y Push de imagen
       - name: Build y Push Docker image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 #v6
         with:
           context: .
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
+      # Instalar Syft para SBOM
       - name: Instalar Syft
         run: |
           curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b/usr/local/bin
 
+      # Generar SBOM desde la imagen Docker
       - name: Generar SBOM con Syft
         env:
-          DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+         DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
           syft "$DOCKER_USER/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}" -o cyclonedx-json > sbom_syft.json
 
@@ -96,8 +104,9 @@ jobs:
           name: sbom_syft
           path: sbom_syft.json
 
+      # Analisis de seguridad con Snyk
       - name: Snyk Security Scan
-        uses: snyk/actions/docker@master
+        uses: snyk/actions/docker@ff5c02a0e3adc5c52e2c9e7558edf2b46d69ac1f #master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -123,6 +132,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-region: ${{ secrets.AWS_REGION }}
+          # or use access keys:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
@@ -133,21 +143,26 @@ jobs:
         working-directory: ./terraform
         run: terraform init
 
+
       - name: Terraform Plan
         working-directory: ./terraform
         run: |
-          terraform plan -out=tfplan             -var "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }}"             -var "image_tag=${{ needs.build-test-publish.outputs.image-tag }}"             -var "ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"             -var "weather_api_key=${{ secrets.WEATHER_API_KEY }}"
+          terraform plan -out=tfplan \
+            -var "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }}" \
+            -var "image_tag=${{ needs.build-test-publish.outputs.image-tag }}" \
+            -var "ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" \
+            -var "weather_api_key=${{ secrets.WEATHER_API_KEY }}"
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
         working-directory: ./terraform
-        run: terraform apply -auto-approve tfplan
+        run: |
+          terraform apply -auto-approve tfplan
 
       - name: Get EC2 IP from Terraform
         id: ec2_ip
         run: echo "EC2_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
         working-directory: ./terraform
-
       - name: Output instance info
         if: github.ref == 'refs/heads/main'
         working-directory: ./terraform
@@ -173,7 +188,6 @@ jobs:
           done
           echo "EC2 not ready after waiting."
           exit 1
-
       - name: Wait for Docker inside EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -185,6 +199,7 @@ jobs:
             for i in {1..15}; do
               if command -v docker >/dev/null 2>&1; then
                 echo "Docker installed!"
+                # Check if Docker daemon is running
                 if sudo docker info >/dev/null 2>&1; then
                   echo "Docker daemon is ready!"
                   exit 0
@@ -214,31 +229,27 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
-            echo ">>> Crear prometheus.yml"
-            cat << 'EOF' > /home/ubuntu/prometheus.yml
-global:
-  scrape_interval: 15s
-
-scrape_configs:
-  - job_name: 'app_clima'
-    static_configs:
-      - targets: ['localhost:8000'] 
-EOF
-
-            echo ">>> Crear docker-compose-prometheus.yml"
-            cat << 'EOF' > /home/ubuntu/docker-compose-prometheus.yml
-version: "3.9"
-
-services:
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    restart: always
-EOF
-
-            sudo docker compose -f /home/ubuntu/docker-compose-prometheus.yml down || true
-            sudo docker compose -f /home/ubuntu/docker-compose-prometheus.yml up -d
+              echo ">>> Crear prometheus.yml"
+              cat << 'EOF' > /home/ubuntu/prometheus.yml
+              global:
+              scrape_interval: 15s
+              scrape_configs:
+              - job_name: 'app_clima'
+              static_configs:
+              - targets: ['localhost:8000']
+              EOF
+              echo ">>> Crear docker-compose-prometheus.yml"
+              cat << 'EOF' > /home/ubuntu/docker-compose-prometheus.yml
+              version: "3.9"
+              services:
+              prometheus:
+              image: prom/prometheus:latest
+              container_name: prometheus
+              ports:
+              - "9090:9090"
+              volumes:
+              - ./prometheus.yml:/etc/prometheus/prometheus.yml
+              restart: always
+              EOF
+              sudo docker compose -f /home/ubuntu/docker-compose-prometheus.yml down || true
+              sudo docker compose -f /home/ubuntu/docker-compose-prometheus.yml up -d
