@@ -18,7 +18,7 @@ jobs:
   build-test-publish:
     runs-on: ubuntu-latest
     outputs:
-      image-tag: ${{steps.set-tag.outputs.IMAGE_TAG}}
+      image-tag: ${{ steps.set-tag.outputs.IMAGE_TAG }}
 
     steps:
       - name: Checkout codigo
@@ -48,20 +48,18 @@ jobs:
         run: |
           TAG=${GITHUB_SHA::8}
           echo "IMAGE_TAG=$TAG" >> $GITHUB_ENV
-          echo "::set-output name=IMAGE_TAG::$TAG"
+          echo "IMAGE_TAG=$TAG" >> $GITHUB_OUTPUT
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@d08d592c0b694607865c089cba90bbf87c9a6d89
+        uses: SonarSource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Descargar reporte SonarCloud
+      - name: Descargar reporte SonarCloud (SARIF)
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          curl -u "$SONAR_TOKEN:" \
-          "https://sonarcloud.io/api/issues/search?componentKeys=JimenaPereyra_mundoseproyecto1&types=VULNERABILITY,BUG,CODE_SMELL&ps=500" \
-          -o sonar_report.json
+          curl -u "$SONAR_TOKEN:"           "https://sonarcloud.io/api/issues/search?componentKeys=JimenaPereyra_mundoseproyecto1&types=VULNERABILITY,BUG,CODE_SMELL&ps=500"           -o sonar_report.json
 
       - name: Subir artifact reporte SonarCloud
         uses: actions/upload-artifact@v4
@@ -70,13 +68,13 @@ jobs:
           path: sonar_report.json
 
       - name: Login a Docker Hub
-        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build y Push Docker image
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
@@ -99,7 +97,7 @@ jobs:
           path: sbom_syft.json
 
       - name: Snyk Security Scan
-        uses: snyk/actions/docker@ff5c02a0e3adc5c52e2c9e7558edf2b46d69ac1f
+        uses: snyk/actions/docker@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
@@ -112,7 +110,6 @@ jobs:
     name: Terraform deploy to AWS (EC2)
     runs-on: ubuntu-latest
     needs: build-test-publish
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -139,11 +136,7 @@ jobs:
       - name: Terraform Plan
         working-directory: ./terraform
         run: |
-          terraform plan -out=tfplan \
-            -var "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }}" \
-            -var "image_tag=${{ needs.build-test-publish.outputs.image-tag }}" \
-            -var "ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" \
-            -var "weather_api_key=${{ secrets.WEATHER_API_KEY }}"
+          terraform plan -out=tfplan             -var "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }}"             -var "image_tag=${{ needs.build-test-publish.outputs.image-tag }}"             -var "ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"             -var "weather_api_key=${{ secrets.WEATHER_API_KEY }}"
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
@@ -152,8 +145,8 @@ jobs:
 
       - name: Get EC2 IP from Terraform
         id: ec2_ip
-        working-directory: ./terraform
         run: echo "EC2_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
+        working-directory: ./terraform
 
       - name: Output instance info
         if: github.ref == 'refs/heads/main'
@@ -178,6 +171,7 @@ jobs:
             echo "Retrying in 10 seconds..."
             sleep 10
           done
+          echo "EC2 not ready after waiting."
           exit 1
 
       - name: Wait for Docker inside EC2
@@ -187,12 +181,19 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
+            echo "Waiting for Docker to be ready..."
             for i in {1..15}; do
-              if sudo docker info >/dev/null 2>&1; then
-                exit 0
+              if command -v docker >/dev/null 2>&1; then
+                echo "Docker installed!"
+                if sudo docker info >/dev/null 2>&1; then
+                  echo "Docker daemon is ready!"
+                  exit 0
+                fi
               fi
+              echo "Docker not ready yet, retrying..."
               sleep 10
             done
+            echo "Docker did not become ready in time"
             exit 1
 
       - name: Start Grafana on EC2
@@ -221,7 +222,7 @@ global:
 scrape_configs:
   - job_name: 'app_clima'
     static_configs:
-      - targets: ['localhost:8000']
+      - targets: ['localhost:8000'] 
 EOF
 
             echo ">>> Crear docker-compose-prometheus.yml"
@@ -241,6 +242,3 @@ EOF
 
             sudo docker compose -f /home/ubuntu/docker-compose-prometheus.yml down || true
             sudo docker compose -f /home/ubuntu/docker-compose-prometheus.yml up -d
-
-
-
