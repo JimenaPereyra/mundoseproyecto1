@@ -255,9 +255,10 @@ jobs:
                   volumes:
                     - ./prometheus.yml:/etc/prometheus/prometheus.yml
                   restart: always
-              EOF
-              sudo docker compose -f /home/ubuntu/docker-compose-prometheus.yml down || true
-              sudo docker compose -f /home/ubuntu/docker-compose-prometheus.yml up -d
+             EOF
+             sudo docker compose -f /home/ubuntu/docker-compose-prometheus.yml down || true
+             sudo docker compose -f /home/ubuntu/docker-compose-prometheus.yml up -d
+
 
 
 
