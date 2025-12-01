@@ -249,8 +249,8 @@ jobs:
 
 
 
-       echo ">>> Copy docker-compose-prometheus.yml to EC2"
-       cat << 'EOF' > /home/ubuntu/docker-compose-prometheus.yml
+            echo ">>> Copy docker-compose-prometheus.yml to EC2"
+            cat << 'EOF' > /home/ubuntu/docker-compose-prometheus.yml
 version: "3.9"
 
 services:
@@ -262,7 +262,7 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     restart: always
-EOF
+   EOF
 
       sudo docker-compose -f /home/ubuntu/docker-compose-prometheus.yml down || true
       sudo docker-compose -f /home/ubuntu/docker-compose-prometheus.yml up -d
