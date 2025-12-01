@@ -237,15 +237,16 @@ jobs:
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
             echo ">>> Copy prometheus.yml to EC2"
-            cat << 'EOF' > /home/ubuntu/prometheus.yml
-      global:
-        scrape_interval: 15s
+cat << 'EOF' > /home/ubuntu/prometheus.yml
+global:
+  scrape_interval: 15s
 
-      scrape_configs:
-        - job_name: 'app_clima'
-          static_configs:
-            - targets: ['localhost:8000']
+scrape_configs:
+  - job_name: 'app_clima'
+    static_configs:
+      - targets: ['localhost:8000']
 EOF
+
 
        echo ">>> Copy docker-compose-prometheus.yml to EC2"
        cat << 'EOF' > /home/ubuntu/docker-compose-prometheus.yml
