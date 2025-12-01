@@ -245,7 +245,7 @@ jobs:
     - job_name: 'app_clima'
       static_configs:
         - targets: ['localhost:8000']
-  EOF
+            EOF
 
 
 
