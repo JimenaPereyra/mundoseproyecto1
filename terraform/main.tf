@@ -85,30 +85,37 @@ resource "aws_instance" "app" {
 #!/bin/bash
 set -e
 
+export DEBIAN_FRONTEND=noninteractive
+
 # ===============================
-# 1 Actualizar paquetes
+# 1. Actualizar paquetes
 # ===============================
 apt-get update -y
 apt-get upgrade -y
 
 # ===============================
-# 2 Instalar Docker + Git + curl
+# 2. Instalar Docker y dependencias
 # ===============================
-sudo apt-get install -y docker.io
+apt-get install -y docker.io ca-certificates curl gnupg lsb-release
+
+# Crear keyring
+install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+chmod a+r /etc/apt/keyrings/docker.gpg
+
+# Agregar repo oficial Docker
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
+    | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+# Actualizar repositorios e instalar Docker + Compose
+apt-get update -y
+apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # Habilitar Docker
 systemctl enable --now docker
 
 # Agregar usuario ubuntu al grupo docker
 usermod -aG docker ubuntu
-
-# ===============================
-# 3 Instalar Docker Compose v2
-# ===============================
-
-sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
-
 
 
 # Verificar instalación
