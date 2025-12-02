@@ -87,6 +87,7 @@ resource "aws_instance" "app" {
     apt-get update -y
     apt-get install -y docker.io jq
     systemctl enable --now docker
+    docker run --rm hello-world || true
   EOF 
 
 
