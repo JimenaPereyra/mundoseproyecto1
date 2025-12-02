@@ -1,11 +1,38 @@
 version: "3.9"
 
 services:
+  app_clima:
+    build:
+      context: .
+    container_name: app_clima
+    ports:
+      - "5000:5000"
+    environment:
+      - WEATHER_API_KEY=${WEATHER_API_KEY}
+      - CACHE_TTL_SECONDS=60
+    networks:
+      - monitoring
+
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
     ports:
       - "9090:9090"
     volumes:
-      - /home/ubuntu/prometheus.yml:/etc/prometheus/prometheus.yml
-    restart: always
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+    networks:
+      - monitoring
+
+networks:
+  monitoring:

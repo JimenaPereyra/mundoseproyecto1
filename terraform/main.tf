@@ -82,21 +82,34 @@ resource "aws_instance" "app" {
   key_name = "proyectofinal"
 
   user_data = <<-EOF
-    #!/bin/bash
-    apt-get update -y
-    apt-get install -y docker.io jq
-    systemctl enable --now docker
+#!/bin/bash
+set -e
 
-    # optional: docker login if you want to pull private images (credentials via AWS Secrets or passed env)
-    # Pull and run the app (pass SECRET/WEATHER_API_KEY as env)
-    docker pull ${var.dockerhub_username}/app_clima2:${var.image_tag} || docker pull ${var.dockerhub_username}/app_clima2:latest
-    docker rm -f clima-app || true
-    docker run -d -p 80:5000 \
-      -e SECRET_KEY="${var.weather_api_key}" \
-      -e WEATHER_API_KEY="${var.weather_api_key}" \
-      --name clima-app ${var.dockerhub_username}/app_clima2:${var.image_tag}
-    sudo usermod -aG docker ubuntu
-  EOF
+# Actualizar paquetes
+apt-get update -y
+
+# Instalar Docker + Docker Compose plugin + Git
+apt-get install -y docker.io docker-compose-plugin git
+
+# Habilitar Docker
+systemctl enable --now docker
+
+# Agregar usuario ubuntu al grupo docker
+usermod -aG docker ubuntu
+
+# Clonar tu repositorio público
+cd /home/ubuntu
+git clone https://github.com/JimenaPereyra/mundoseproyecto1.git proyecto
+cd proyecto
+
+# Exportar variables que tu docker-compose necesita
+export WEATHER_API_KEY="${var.weather_api_key}"
+export SECRET_KEY="${var.weather_api_key}"
+
+# Construir y levantar los servicios
+docker compose up -d --build
+
+EOF
 
   tags = { Name = "clima-app-instance" }
 }
