@@ -87,7 +87,8 @@ resource "aws_instance" "app" {
     apt-get update -y
     apt-get install -y docker.io jq
     systemctl enable --now docker
-    apt-get install -y docker-compose-plugin
+    sudo curl -L \"github.com(uname -s)-$(uname -m)\" -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
   EOF 
 
 
