@@ -81,7 +81,7 @@ resource "aws_instance" "app" {
   vpc_security_group_ids = [aws_security_group.sg.id]
   key_name = "proyectofinal"
 
-  user_data = <<-EOF
+  user_data = <<'EOF'
 #!/bin/bash
 set -e
 
@@ -106,7 +106,7 @@ usermod -aG docker ubuntu
 # 3 Instalar Docker Compose v2
 # ===============================
 DOCKER_COMPOSE_VERSION="v2.20.2"
-curl -L "https://github.com/docker/compose/releases/download/\${DOCKER_COMPOSE_VERSION}/docker-compose-\$(uname -s)-\$(uname -m)" -o /usr/local/bin/docker-compose
+curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-\$(uname -s)-\$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 
 # Verificar instalación
