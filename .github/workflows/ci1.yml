@@ -146,7 +146,7 @@ jobs:
       - name: Terraform Plan
         working-directory: ./terraform
         run: |
-          terraform plan -out=tfplan \
+          terraform plan -refresh=false -out=tfplan \
             -var "ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" \
             -var "weather_api_key=${{ secrets.WEATHER_API_KEY }}"
 
@@ -255,11 +255,3 @@ jobs:
 #             EOF
 #              sudo docker-compose -f /home/ubuntu/docker-compose-prometheus.yml down || true
 #              sudo docker-compose -f /home/ubuntu/docker-compose-prometheus.yml up -d
-
-
-
-
-
-
-
-
