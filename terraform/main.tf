@@ -94,7 +94,7 @@ apt-get upgrade -y
 # ===============================
 # 2 Instalar Docker + Git + curl
 # ===============================
-apt-get install -y docker.io git curl
+sudo apt-get install -y docker.io
 
 # Habilitar Docker
 systemctl enable --now docker
@@ -105,9 +105,10 @@ usermod -aG docker ubuntu
 # ===============================
 # 3 Instalar Docker Compose v2
 # ===============================
-DOCKER_COMPOSE_VERSION="v2.20.2"
-curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose
+
+sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
 
 
 # Verificar instalación
