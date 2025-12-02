@@ -85,11 +85,16 @@ resource "aws_instance" "app" {
 #!/bin/bash
 set -e
 
-# Actualizar paquetes
+# ===============================
+# 1 Actualizar paquetes
+# ===============================
 apt-get update -y
+apt-get upgrade -y
 
-# Instalar Docker + Docker Compose plugin + Git
-apt-get install -y docker.io docker-compose-plugin git
+# ===============================
+# 2 Instalar Docker + Git + curl
+# ===============================
+apt-get install -y docker.io git curl
 
 # Habilitar Docker
 systemctl enable --now docker
@@ -97,19 +102,44 @@ systemctl enable --now docker
 # Agregar usuario ubuntu al grupo docker
 usermod -aG docker ubuntu
 
-# Clonar tu repositorio público
+# ===============================
+# 3 Instalar Docker Compose v2
+# ===============================
+DOCKER_COMPOSE_VERSION="v2.20.2"
+curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+
+# Verificar instalación
+docker --version
+docker-compose version
+
+# ===============================
+# 4 Clonar repositorio con docker-compose
+# ===============================
 cd /home/ubuntu
-git clone https://github.com/JimenaPereyra/mundoseproyecto1.git proyecto
+if [ ! -d "proyecto" ]; then
+    git clone https://github.com/JimenaPereyra/mundoseproyecto1.git proyecto
+fi
 cd proyecto
 
-# Exportar variables que tu docker-compose necesita
+# ===============================
+# 5 Exportar variables necesarias para tu app
+# ===============================
 export WEATHER_API_KEY="${var.weather_api_key}"
 export SECRET_KEY="${var.weather_api_key}"
 
-# Construir y levantar los servicios
-docker compose up -d --build
+# ===============================
+# 6 Construir y levantar contenedores
+# ===============================
+docker-compose up -d --build
+
+# ===============================
+# 7 Permisos y limpieza
+# ===============================
+chown -R ubuntu:ubuntu /home/ubuntu/proyecto
 
 EOF
+
 
   tags = { Name = "clima-app-instance" }
 }
