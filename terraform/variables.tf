@@ -4,14 +4,14 @@ variable "aws_region" {
 }
 
 
-variable "dockerhub_username" {
-  type = string
-}
+#variable "dockerhub_username" {
+#  type = string
+#}
 
-variable "image_tag" {
-  type = string
-  description = "Tag de la docker image para deploy"
-}
+#variable "image_tag" {
+#  type = string
+#  description = "Tag de la docker image para deploy"
+#}
 
 variable "weather_api_key" {
   type = string
