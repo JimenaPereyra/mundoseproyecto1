@@ -122,31 +122,6 @@ usermod -aG docker ubuntu
 docker --version
 docker-compose version
 
-# ===============================
-# 4 Clonar repositorio con docker-compose
-# ===============================
-cd /home/ubuntu
-if [ ! -d "proyecto" ]; then
-    git clone https://github.com/JimenaPereyra/mundoseproyecto1.git proyecto
-fi
-cd proyecto
-
-# ===============================
-# 5 Exportar variables necesarias para tu app
-# ===============================
-export WEATHER_API_KEY="${var.weather_api_key}"
-export SECRET_KEY="${var.weather_api_key}"
-
-# ===============================
-# 6 Construir y levantar contenedores
-# ===============================
-docker-compose up -d --build
-
-# ===============================
-# 7 Permisos y limpieza
-# ===============================
-chown -R ubuntu:ubuntu /home/ubuntu/proyecto
-
 EOF
 
 
