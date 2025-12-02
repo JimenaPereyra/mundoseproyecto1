@@ -150,27 +150,27 @@ jobs:
             -var "ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" \
             -var "weather_api_key=${{ secrets.WEATHER_API_KEY }}"
 
-#      - name: Terraform Apply
-#        if: github.ref == 'refs/heads/main'
-#        working-directory: ./terraform
-#        run: |
-#          terraform apply -auto-approve tfplan
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        working-directory: ./terraform
+        run: |
+          terraform apply -auto-approve tfplan
 
-#      - name: Get EC2 IP from Terraform
-#        id: ec2_ip
-#        run: echo "EC2_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
-#        working-directory: ./terraform
-#      - name: Output instance info
-#        if: github.ref == 'refs/heads/main'
-#        working-directory: ./terraform
-#        run: terraform output -json > tf_outputs.json
+      - name: Get EC2 IP from Terraform
+        id: ec2_ip
+        run: echo "EC2_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
+        working-directory: ./terraform
+      - name: Output instance info
+        if: github.ref == 'refs/heads/main'
+        working-directory: ./terraform
+        run: terraform output -json > tf_outputs.json
 
-#      - name: Upload terraform outputs
-#        if: github.ref == 'refs/heads/main'
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: terraform-outputs
-#          path: tf_outputs.json
+      - name: Upload terraform outputs
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-outputs
+          path: tf_outputs.json
 
 #      - name: Wait for EC2 SSH to be ready
 #        run: |
