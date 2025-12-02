@@ -3,6 +3,11 @@ variable "aws_region" {
   default = "us-east-1"
 }
 
+variable "availability_zone" {
+  description = "Zona de disponibilidad de la subnet"
+  type        = string
+  default     = "us-east-1a"
+}
 
 #variable "dockerhub_username" {
 #  type = string
