@@ -143,121 +143,118 @@ jobs:
         working-directory: ./terraform
         run: terraform init
 
-
       - name: Terraform Plan
         working-directory: ./terraform
         run: |
           terraform plan -out=tfplan \
-            -var "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }}" \
-            -var "image_tag=${{ needs.build-test-publish.outputs.image-tag }}" \
             -var "ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" \
             -var "weather_api_key=${{ secrets.WEATHER_API_KEY }}"
 
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
-        working-directory: ./terraform
-        run: |
-          terraform apply -auto-approve tfplan
+#      - name: Terraform Apply
+#        if: github.ref == 'refs/heads/main'
+#        working-directory: ./terraform
+#        run: |
+#          terraform apply -auto-approve tfplan
 
-      - name: Get EC2 IP from Terraform
-        id: ec2_ip
-        run: echo "EC2_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
-        working-directory: ./terraform
-      - name: Output instance info
-        if: github.ref == 'refs/heads/main'
-        working-directory: ./terraform
-        run: terraform output -json > tf_outputs.json
+#      - name: Get EC2 IP from Terraform
+#        id: ec2_ip
+#        run: echo "EC2_IP=$(terraform output -raw public_ip)" >> $GITHUB_ENV
+#        working-directory: ./terraform
+#      - name: Output instance info
+#        if: github.ref == 'refs/heads/main'
+#        working-directory: ./terraform
+#        run: terraform output -json > tf_outputs.json
 
-      - name: Upload terraform outputs
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v4
-        with:
-          name: terraform-outputs
-          path: tf_outputs.json
+#      - name: Upload terraform outputs
+#        if: github.ref == 'refs/heads/main'
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: terraform-outputs
+#          path: tf_outputs.json
 
-      - name: Wait for EC2 SSH to be ready
-        run: |
-          echo "Waiting for EC2 to accept SSH..."
-          for i in {1..15}; do
-            if nc -zv $EC2_IP 22; then
-              echo "SSH is ready!"
-              exit 0
-            fi
-            echo "Retrying in 10 seconds..."
-            sleep 10
-          done
-          echo "EC2 not ready after waiting."
-          exit 1
-      - name: Wait for Docker inside EC2
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ env.EC2_IP }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          script: |
-            echo "Waiting for Docker to be ready..."
-            for i in {1..15}; do
-              if command -v docker >/dev/null 2>&1; then
-                echo "Docker installed!"
-                # Check if Docker daemon is running
-                if sudo docker info >/dev/null 2>&1; then
-                  echo "Docker daemon is ready!"
-                  exit 0
-                fi
-              fi
-              echo "Docker not ready yet, retrying..."
-              sleep 10
-            done
-            echo "Docker did not become ready in time"
-            exit 1
-
-      - name: Start Grafana on EC2
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ env.EC2_IP }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          script: |
-            sudo docker stop grafana || true
-            sudo docker rm grafana || true
-            sudo docker run -d -p 3000:3000 --name grafana grafana/grafana:latest
-
-      - name: Deploy Prometheus via Docker Compose
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ env.EC2_IP }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-          script: |
-             # Instalar Docker Compose manualmente
-             sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.6/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-             sudo chmod +x /usr/local/bin/docker-compose
-
-              echo ">>> Crear prometheus.yml"
-              cat << 'EOF' > /home/ubuntu/prometheus.yml
-              global:
-                scrape_interval: 15s
-              scrape_configs:
-                - job_name: 'app_clima'
-                  static_configs:
-                    - targets: ['localhost:8000']
-             EOF
-              echo ">>> Crear docker-compose-prometheus.yml"
-              cat << 'EOF' > /home/ubuntu/docker-compose-prometheus.yml
-              version: "3.9"
-              
-              services:
-                prometheus:
-                  image: prom/prometheus:latest
-                  container_name: prometheus
-                  ports:
-                    - "9090:9090"
-                  volumes:
-                    - ./prometheus.yml:/etc/prometheus/prometheus.yml
-                  restart: always
-             EOF
-              sudo docker-compose -f /home/ubuntu/docker-compose-prometheus.yml down || true
-              sudo docker-compose -f /home/ubuntu/docker-compose-prometheus.yml up -d
+#      - name: Wait for EC2 SSH to be ready
+#        run: |
+#          echo "Waiting for EC2 to accept SSH..."
+#          for i in {1..15}; do
+#            if nc -zv $EC2_IP 22; then
+#              echo "SSH is ready!"
+#              exit 0
+#            fi
+#            echo "Retrying in 10 seconds..."
+#            sleep 10
+#          done
+#          echo "EC2 not ready after waiting."
+#          exit 1
+#      - name: Wait for Docker inside EC2
+#        uses: appleboy/ssh-action@v1.0.3
+#        with:
+#          host: ${{ env.EC2_IP }}
+#          username: ubuntu
+#          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+#          script: |
+#            echo "Waiting for Docker to be ready..."
+#            for i in {1..15}; do
+#              if command -v docker >/dev/null 2>&1; then
+#                echo "Docker installed!"
+#                # Check if Docker daemon is running
+#                if sudo docker info >/dev/null 2>&1; then
+#                  echo "Docker daemon is ready!"
+#                  exit 0
+#                fi
+#              fi
+#              echo "Docker not ready yet, retrying..."
+#              sleep 10
+#            done
+#            echo "Docker did not become ready in time"
+#            exit 1
+#
+#      - name: Start Grafana on EC2
+#        uses: appleboy/ssh-action@v1.0.3
+#        with:
+#          host: ${{ env.EC2_IP }}
+#          username: ubuntu
+#          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+#          script: |
+#            sudo docker stop grafana || true
+#            sudo docker rm grafana || true
+#            sudo docker run -d -p 3000:3000 --name grafana grafana/grafana:latest
+#
+#      - name: Deploy Prometheus via Docker Compose
+#        uses: appleboy/ssh-action@v1.0.3
+#        with:
+#          host: ${{ env.EC2_IP }}
+#          username: ubuntu
+#          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+#          script: |
+#             # Instalar Docker Compose manualmente
+#             sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.6/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+#             sudo chmod +x /usr/local/bin/docker-compose
+#
+#              echo ">>> Crear prometheus.yml"
+#              cat << 'EOF' > /home/ubuntu/prometheus.yml
+#              global:
+#                scrape_interval: 15s
+#              scrape_configs:
+#                - job_name: 'app_clima'
+#                  static_configs:
+#                    - targets: ['localhost:8000']
+#             EOF
+#              echo ">>> Crear docker-compose-prometheus.yml"
+#              cat << 'EOF' > /home/ubuntu/docker-compose-prometheus.yml
+#              version: "3.9"
+#              
+#              services:
+#                prometheus:
+#                  image: prom/prometheus:latest
+#                  container_name: prometheus
+#                  ports:
+#                    - "9090:9090"
+#                  volumes:
+#                    - ./prometheus.yml:/etc/prometheus/prometheus.yml
+#                  restart: always
+#             EOF
+#              sudo docker-compose -f /home/ubuntu/docker-compose-prometheus.yml down || true
+#              sudo docker-compose -f /home/ubuntu/docker-compose-prometheus.yml up -d
 
 
 
