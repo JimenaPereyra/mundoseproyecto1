@@ -85,10 +85,11 @@ resource "aws_instance" "app" {
   user_data = <<-EOF
     #!/bin/bash
     apt-get update -y
-    apt-get install -y docker.io jq
+    apt-get install -y docker.io curl jq
     systemctl enable --now docker
-    sudo curl -L \"github.com(uname -s)-$(uname -m)\" -o /usr/local/bin/docker-compose
-    sudo chmod +x /usr/local/bin/docker-compose
+    curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+    chmod +x /usr/local/bin/docker-compose
   EOF 
 
 
