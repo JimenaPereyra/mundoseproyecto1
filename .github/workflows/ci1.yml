@@ -215,6 +215,18 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i ssh_key.pem ubuntu@$EC2_IP << 'EOF'
           sudo apt-get update -y
           sudo apt-get install -y git
+          echo "Waiting for Docker inside EC2..."
+          for i in {1..15}; do
+           if command -v docker >/dev/null 2>&1; then
+             echo "Docker installed."
+             if sudo docker info >/dev/null 2>&1; then
+               echo "Docker daemon is ready!"
+               break
+             fi
+           fi
+           echo "Docker not ready yet... retrying"
+           sleep 10
+          done
           # Clonar repositorio
           if [ ! -d "proyecto" ]; then
             git clone https://github.com/JimenaPereyra/mundoseproyecto1.git proyecto
