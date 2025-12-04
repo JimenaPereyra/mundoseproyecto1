@@ -236,8 +236,8 @@ jobs:
           export WEATHER_API_KEY="${WEATHER_API_KEY}"
           export SECRET_KEY="${SECRET_KEY}"
 
-          docker compose down
-          docker compose up -d --build
+          docker-compose down
+          docker-compose up -d --build
           EOF
         env:
          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
