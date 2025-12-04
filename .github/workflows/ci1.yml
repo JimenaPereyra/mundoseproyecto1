@@ -215,7 +215,22 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i ssh_key.pem ubuntu@$EC2_IP << 'EOF'
           sudo apt-get update -y
           sudo apt-get install -y git
+          # Clonar repositorio
+          if [ ! -d "proyecto" ]; then
+            git clone https://github.com/JimenaPereyra/mundoseproyecto1.git proyecto
+          fi
+          cd proyecto
+          # Exportar variables (poner aquí tus secrets)
+          export WEATHER_API_KEY="${WEATHER_API_KEY}"
+         export SECRET_KEY="${SECRET_KEY}"
+
+         # Levantar contenedores
+         docker compose down
+         docker compose up -d --build
           EOF
+       env:
+         WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+         SECRET_KEY: ${{ secrets.SECRET_KEY }}
 #
 #      - name: Start Grafana on EC2
 #        uses: appleboy/ssh-action@v1.0.3
