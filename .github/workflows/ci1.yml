@@ -225,7 +225,7 @@ jobs:
              fi
            fi
            echo "Docker not ready yet... retrying"
-           sleep 10
+           sleep 15
           done
           # Clonar repositorio
           if [ ! -d "proyecto" ]; then
@@ -234,13 +234,13 @@ jobs:
           cd proyecto
 
           echo "Waiting for docker compose to be ready..."
-          for i in {1..12}; do
+          for i in {1..15}; do
             if docker compose version >/dev/null 2>&1; then
               echo "docker compose is ready!"
               break
             fi
             echo "docker compose not ready yet… retrying"
-            sleep 5
+            sleep 10
           done
 
           # Última verificación
