@@ -90,25 +90,7 @@ resource "aws_instance" "app" {
     curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 
     chmod +x /usr/local/bin/docker-compose
-# ===============================
-# 4️⃣ Clonar repositorio con docker-compose
-# ===============================
-cd /home/ubuntu
-if [ ! -d "proyecto" ]; then
-    git clone https://github.com/JimenaPereyra/mundoseproyecto1.git proyecto
-fi
-cd proyecto
-
-# ===============================
-# 5️⃣ Exportar variables necesarias para tu app
-# ===============================
-export WEATHER_API_KEY="${var.weather_api_key}"
-export SECRET_KEY="${var.weather_api_key}"
-
-# ===============================
-# 6️⃣ Construir y levantar contenedores
-# ===============================
-docker-compose up -d --build
+apt-get install -y git
   EOF 
 
 
