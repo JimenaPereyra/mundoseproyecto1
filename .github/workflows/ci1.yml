@@ -212,7 +212,7 @@ jobs:
           echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ssh_key.pem
           chmod 600 ssh_key.pem
 
-          ssh -o StrictHostKeyChecking=no -i ssh_key.pem ubuntu@${{ steps.tf.outputs.EC2_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ssh_key.pem ubuntu@$EC2_IP << 'EOF'
           sudo apt-get update -y
           sudo apt-get install -y git
           EOF
