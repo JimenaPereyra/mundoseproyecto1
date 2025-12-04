@@ -213,9 +213,9 @@ jobs:
           chmod 600 ssh_key.pem
 
           ssh -o StrictHostKeyChecking=no -i ssh_key.pem ubuntu@${{ steps.tf.outputs.EC2_IP }} << 'EOF'
-      sudo apt-get update -y
-      sudo apt-get install -y git
-    EOF
+          sudo apt-get update -y
+          sudo apt-get install -y git
+          EOF
 #
 #      - name: Start Grafana on EC2
 #        uses: appleboy/ssh-action@v1.0.3
