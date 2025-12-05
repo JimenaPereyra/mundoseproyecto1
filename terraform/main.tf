@@ -64,6 +64,13 @@ resource "aws_security_group" "sg" {
     protocol  = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  #Puerto App
+  ingress {
+    from_port = 5000
+    to_port   = 5000
+    protocol  = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 # Puerto Prometheus
   ingress {
     description = "Prometheus"
