@@ -109,6 +109,33 @@ EOF
 
 sudo apt update
 sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+sudo systemctl status docker
+sudo systemctl start docker
+
+echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ssh_key.pem
+chmod 600 ssh_key.pem
+
+ssh -o StrictHostKeyChecking=no -i ssh_key.pem ubuntu@$EC2_IP << 'EOF'
+sudo apt-get update -y
+sudo apt-get install -y git
+
+if [ ! -d "proyecto" ]; then
+      git clone https://github.com/JimenaPereyra/mundoseproyecto1.git proyecto
+fi
+
+cd proyecto
+
+# Exportar variables (poner aquí tus secrets)
+export WEATHER_API_KEY="${WEATHER_API_KEY}"
+export SECRET_KEY="${SECRET_KEY}"
+
+sudo docker-compose down
+sudo docker-compose up -d --build
+EOF
+env:
+   WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+   SECRET_KEY: ${{ secrets.SECRET_KEY }}
    # curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 
    # chmod +x /usr/local/bin/docker-compose
