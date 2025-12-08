@@ -192,7 +192,7 @@ jobs:
           chmod 600 ssh_key.pem
 
 
-          ssh -o StrictHostKeyChecking=no -i ssh_key.pem ubuntu@$EC2_IP << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ssh_key.pem ubuntu@$EC2_IP << EOF
           set -e
 
           echo "[1/5] Instalando dependencias base..."
