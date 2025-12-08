@@ -190,15 +190,6 @@ jobs:
         run: |
           echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ssh_key.pem
           chmod 600 ssh_key.pem
-          # Genero archivo .env localmente usando SECRETS
-          cat <<EOF > .env
-          WEATHER_API_KEY=${{ secrets.WEATHER_API_KEY }}
-          SECRET_KEY=${{ secrets.SECRET_KEY }}
-          CACHE_TTL_SECONDS=60
-          EOF
-
-          # Copio el .env al servidor
-          scp -o StrictHostKeyChecking=no -i ssh_key.pem .env ubuntu@$EC2_IP:/home/ubuntu/proyecto/.env
 
 
           ssh -o StrictHostKeyChecking=no -i ssh_key.pem ubuntu@$EC2_IP << 'EOF'
@@ -236,6 +227,15 @@ jobs:
           fi
           cd proyecto
           git pull
+
+          cat <<ENVFILE > .env
+          WEATHER_API_KEY=${WEATHER_API_KEY}
+          SECRET_KEY=${SECRET_KEY}
+          CACHE_TTL_SECONDS=60
+          ENVFILE
+
+          echo "Contenido de .env creado en EC2:"
+          cat .env
 
           echo "[5/5] Levantando contenedores..."
 
