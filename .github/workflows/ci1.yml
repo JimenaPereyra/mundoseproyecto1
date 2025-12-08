@@ -185,6 +185,59 @@ jobs:
           done
           echo "EC2 not ready after waiting."
           exit 1
+
+      - name: Deploy app en EC2 vía SSH
+        run: |
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ssh_key.pem
+          chmod 600 ssh_key.pem
+
+          ssh -o StrictHostKeyChecking=no -i ssh_key.pem ubuntu@$EC2_IP << 'EOF'
+          set -e
+
+          echo "[1/5] Instalando dependencias base..."
+          sudo apt-get update -y
+          sudo apt-get install -y ca-certificates curl git
+
+          echo "[2/5] Instalando Docker Engine..."
+          sudo install -m 0755 -d /etc/apt/keyrings
+          sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+          sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+          echo "Types: deb
+      URIs: https://download.docker.com/linux/ubuntu
+      Suites: $(. /etc/os-release && echo \"$UBUNTU_CODENAME\")
+      Components: stable
+      Signed-By: /etc/apt/keyrings/docker.asc" \
+            | sudo tee /etc/apt/sources.list.d/docker.sources > /dev/null
+
+          sudo apt-get update -y
+          sudo apt-get install -y \
+           docker-ce docker-ce-cli containerd.io \
+           docker-buildx-plugin docker-compose-plugin
+
+          echo "[3/5] Habilitando Docker..."
+          sudo systemctl enable --now docker
+
+          echo "[4/5] Descargando proyecto..."
+          cd /home/ubuntu
+          if [ ! -d "proyecto" ]; then
+             git clone https://github.com/JimenaPereyra/mundoseproyecto1.git proyecto
+          fi
+          cd proyecto
+          git pull
+
+          echo "[5/5] Levantando contenedores..."
+          export WEATHER_API_KEY="${WEATHER_API_KEY}"
+          export SECRET_KEY="${SECRET_KEY}"
+
+          sudo docker compose down || true
+          sudo docker compose up -d --build
+
+          echo "Deploy completado correctamente en la EC2."
+  EOF
+  env:
+    WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+    SECRET_KEY: ${{ secrets.SECRET_KEY }}
 #      - name: Wait for Docker inside EC2
 #        uses: appleboy/ssh-action@v1.0.3
 #        with:

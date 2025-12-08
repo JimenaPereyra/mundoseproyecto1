@@ -89,57 +89,57 @@ resource "aws_instance" "app" {
   key_name = "proyectofinal"
 
 
-  user_data = <<-EOT
-    #!/bin/bash
-# Add Docker's official GPG key:
-sudo apt update
-sudo apt install ca-certificates curl
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-
-# Add the repository to Apt sources:
-sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
-Types: deb
-URIs: https://download.docker.com/linux/ubuntu
-Suites: $(. /etc/os-release && echo "$${UBUNTU_CODENAME:-$${VERSION_CODENAME}}")
-Components: stable
-Signed-By: /etc/apt/keyrings/docker.asc
-EOF
-
-sudo apt update
-sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-
-sudo systemctl status docker
-sudo systemctl start docker
-
-echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ssh_key.pem
-chmod 600 ssh_key.pem
-
-ssh -o StrictHostKeyChecking=no -i ssh_key.pem ubuntu@$EC2_IP << 'EOF'
-sudo apt-get update -y
-sudo apt-get install -y git
-
-if [ ! -d "proyecto" ]; then
-      git clone https://github.com/JimenaPereyra/mundoseproyecto1.git proyecto
-fi
-
-cd proyecto
-
-# Exportar variables (poner aquí tus secrets)
-export WEATHER_API_KEY="${WEATHER_API_KEY}"
-export SECRET_KEY="${SECRET_KEY}"
-
-sudo docker-compose down
-sudo docker-compose up -d --build
-EOF
-env:
-   WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
-   SECRET_KEY: ${{ secrets.SECRET_KEY }}
-   # curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-   # chmod +x /usr/local/bin/docker-compose
-  EOT 
+#   user_data = <<-EOT
+#     #!/bin/bash
+# # Add Docker's official GPG key:
+# sudo apt update
+# sudo apt install ca-certificates curl
+# sudo install -m 0755 -d /etc/apt/keyrings
+# sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+# sudo chmod a+r /etc/apt/keyrings/docker.asc
+# 
+# # Add the repository to Apt sources:
+# sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+# Types: deb
+# URIs: https://download.docker.com/linux/ubuntu
+# Suites: $(. /etc/os-release && echo "$${UBUNTU_CODENAME:-$${VERSION_CODENAME}}")
+# Components: stable
+# Signed-By: /etc/apt/keyrings/docker.asc
+# EOF
+# 
+# sudo apt update
+# sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+# 
+# sudo systemctl status docker
+# sudo systemctl start docker
+# 
+# echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ssh_key.pem
+# chmod 600 ssh_key.pem
+# 
+# ssh -o StrictHostKeyChecking=no -i ssh_key.pem ubuntu@$EC2_IP << 'EOF'
+# sudo apt-get update -y
+# sudo apt-get install -y git
+# 
+# if [ ! -d "proyecto" ]; then
+#       git clone https://github.com/JimenaPereyra/mundoseproyecto1.git proyecto
+# fi
+# 
+# cd proyecto
+# 
+# # Exportar variables (poner aquí tus secrets)
+# export WEATHER_API_KEY="${WEATHER_API_KEY}"
+# export SECRET_KEY="${SECRET_KEY}"
+# 
+# sudo docker-compose down
+# sudo docker-compose up -d --build
+# EOF
+# env:
+#    WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+#    SECRET_KEY: ${{ secrets.SECRET_KEY }}
+#    # curl -L "https://github.com/docker/compose/releases/download/v2.20.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+# 
+#    # chmod +x /usr/local/bin/docker-compose
+#   EOT 
 
 
  tags = { Name = "clima-app-instance" }
