@@ -244,6 +244,9 @@ jobs:
 
           echo "Deploy completado correctamente en la EC2."
           EOF
+        env:
+          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
 
 #      - name: Wait for Docker inside EC2
 #        uses: appleboy/ssh-action@v1.0.3
