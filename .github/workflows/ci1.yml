@@ -204,12 +204,12 @@ jobs:
           sudo chmod a+r /etc/apt/keyrings/docker.asc
 
           cat <<EOT | sudo tee /etc/apt/sources.list.d/docker.sources
-Types: deb
-URIs: https://download.docker.com/linux/ubuntu
-Suites: $(. /etc/os-release && echo "$UBUNTU_CODENAME")
-Components: stable
-Signed-By: /etc/apt/keyrings/docker.asc
- EOT
+          Types: deb
+          URIs: https://download.docker.com/linux/ubuntu
+          Suites: $(. /etc/os-release && echo "$UBUNTU_CODENAME")
+          Components: stable
+          Signed-By: /etc/apt/keyrings/docker.asc
+          EOT
 
           sudo apt-get update -y
           sudo apt-get install -y \
@@ -235,7 +235,7 @@ Signed-By: /etc/apt/keyrings/docker.asc
           sudo docker compose up -d --build
 
           echo "Deploy completado correctamente en la EC2."
-         EOF
+          EOF
         env:
          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
          SECRET_KEY: ${{ secrets.SECRET_KEY }}
