@@ -209,7 +209,7 @@ URIs: https://download.docker.com/linux/ubuntu
 Suites: $(. /etc/os-release && echo "$UBUNTU_CODENAME")
 Components: stable
 Signed-By: /etc/apt/keyrings/docker.asc
-EOT
+ EOT
 
           sudo apt-get update -y
           sudo apt-get install -y \
