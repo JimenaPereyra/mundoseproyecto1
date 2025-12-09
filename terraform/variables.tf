@@ -46,3 +46,8 @@ variable "key_name" {
   default     = "proyectofinal"
 }
 
+variable "assign_public_ip" {
+  type        = bool
+  default     = true
+  description = "Asignar IP pública a la instancia EC2"
+}

@@ -84,7 +84,7 @@ resource "aws_instance" "app" {
   ami = var.ami_id
   instance_type = var.instance_type
   subnet_id = aws_subnet.public.id
-  associate_public_ip_address = true
+  associate_public_ip_address = var.assign_public_ip
   vpc_security_group_ids = [aws_security_group.sg.id]
   key_name = "proyectofinal"
 
