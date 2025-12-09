@@ -1,7 +1,7 @@
 import os
 import time
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from flask import Flask, render_template, request, jsonify, Response
 from  flask_wtf.csrf import  CSRFProtect
 import requests
@@ -151,7 +151,7 @@ def health():
     # Simple health check endpoint
     healthcheck_counter.inc()
     REQUEST_COUNT.labels(endpoint="/health", method="GET").inc()
-    return jsonify({"status": "ok", "timestamp": datetime.utcnow().isoformat()}), 200
+    return jsonify({"status": "ok", "timestamp": datetime.now(timezone.utc).isoformat()}), 200
 
 
 
