@@ -94,31 +94,31 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y jq
 
-          # Último release
-          RELEASE=$(curl -fsSL https://api.github.com/repos/anchore/syft/releases/latest)
+          # Obtener release usando HTTPS estricto
+          RELEASE=$(curl --fail --silent --show-error --location --proto '=https' --tlsv1.2 \
+            https://api.github.com/repos/anchore/syft/releases/latest)
+
           SYFT_VERSION=$(echo "$RELEASE" | jq -r .tag_name)
 
-          # Obtener asset TAR.GZ correcto
-          ASSET_URL=$(echo "$RELEASE" | jq -r '.assets[] | select(.name | test("linux_amd64.*\\.tar\\.gz$")) | .browser_download_url')
+          ASSET_URL=$(echo "$RELEASE" | jq -r \
+            '.assets[] | select(.name | test("linux_amd64.*\\.tar\\.gz$")) | .browser_download_url')
 
-          # Obtener checksums
-          CHECKSUMS_URL=$(echo "$RELEASE" | jq -r '.assets[] | select(.name | test("checksums.txt$")) | .browser_download_url')
+          CHECKSUMS_URL=$(echo "$RELEASE" | jq -r \
+            '.assets[] | select(.name | test("checksums.txt$")) | .browser_download_url')
 
-          echo "Descargando: $ASSET_URL"
-          echo "Checksums: $CHECKSUMS_URL"
-
-          # Archivo con nombre original
+          echo "Descargando asset seguro: $ASSET_URL"
           FILE_NAME=$(basename "$ASSET_URL")
 
-          curl -fsSL -o "$FILE_NAME" "$ASSET_URL"
-          curl -fsSL -o checksums.txt "$CHECKSUMS_URL"
+          curl --fail --silent --show-error --location --proto '=https' --tlsv1.2 \
+            -o "$FILE_NAME" "$ASSET_URL"
 
-          # Verificar checksum
+          curl --fail --silent --show-error --location --proto '=https' --tlsv1.2 \
+            -o checksums.txt "$CHECKSUMS_URL"
+
           grep "$FILE_NAME" checksums.txt | sha256sum --check -
 
-          # Instalar Syft
           sudo tar -xzf "$FILE_NAME" -C /usr/local/bin syft || \
-          sudo tar -xzf "$FILE_NAME" -C /usr/local/bin --wildcards 'syft*'
+            sudo tar -xzf "$FILE_NAME" -C /usr/local/bin --wildcards 'syft*'
 
           echo "Syft instalado correctamente."
 
