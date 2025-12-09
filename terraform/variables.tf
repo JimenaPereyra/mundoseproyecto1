@@ -56,3 +56,8 @@ variable "ssh_open_world" {
   type        = bool
   default     = false
 }
+variable "ssh_allowed_ips" {
+  description = "Lista de IPs autorizadas para acceder por SSH"
+  type        = list(string)
+  default     = []
+}
