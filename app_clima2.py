@@ -201,8 +201,11 @@ def clima():
         url = f"https://api.openweathermap.org/data/2.5/weather?q={ciudad}&appid={API_KEY}&units=metric&lang=es"
         resp = requests.get(url, timeout=15)
     except requests.RequestException as e:
-        logger.error(f"Error consultando OpenWeather: {e}")
-        raise
+    logger.error(f"Error consultando OpenWeather: {e}")
+    REQUEST_ERRORS.labels(endpoint=request.endpoint, type="openweather_connection").inc()
+    duration = time.perf_counter() - start_request
+    REQUEST_LATENCY.labels(endpoint=request.endpoint).observe(duration)
+    return jsonify({"error": "Error al conectar con el servicio de clima"}), 502
 
         # Error de conexión/timeout al llamar OpenWeather
         REQUEST_ERRORS.labels(endpoint=request.endpoint, type="openweather_connection").inc()
