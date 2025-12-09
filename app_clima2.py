@@ -5,6 +5,14 @@ from datetime import datetime, timezone
 from flask import Flask, render_template, request, jsonify, Response
 from  flask_wtf.csrf import  CSRFProtect
 import requests
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+
+logger = logging.getLogger(__name__)
 
 #para las metricas
 
