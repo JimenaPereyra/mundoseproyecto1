@@ -89,7 +89,9 @@ jobs:
       # Instalar Syft para SBOM
       - name: Instalar Syft
         run: |
-          curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b/usr/local/bin
+          SYFT_VERSION=$(curl -s https://api.github.com/repos/anchore/syft/releases/latest | jq -r .tag_name)
+          curl -sSL -o syft.tgz "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/syft_${SYFT_VERSION#v}_linux_amd64.tar.gz"
+          tar -xzf syft.tgz -C /usr/local/bin syft
 
       # Generar SBOM desde la imagen Docker
       - name: Generar SBOM con Syft
@@ -145,10 +147,13 @@ jobs:
 
       - name: Terraform Plan
         working-directory: ./terraform
+        env:
+          SSH_PUBLIC_KEY: ${{ secrets.SSH_PUBLIC_KEY }}
+          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
         run: |
           terraform plan -refresh=false -out=tfplan \
-            -var "ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" \
-            -var "weather_api_key=${{ secrets.WEATHER_API_KEY }}"
+            -var "ssh_public_key=$SSH_PUBLIC_KEY" \
+            -var "weather_api_key=$WEATHER_API_KEY"
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
@@ -187,8 +192,10 @@ jobs:
           exit 1
 
       - name: Deploy app en EC2 vía SSH
+        env:
+          EC2_SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
         run: |
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ssh_key.pem
+          echo "$EC2_SSH_PRIVATE_KEY" > ssh_key.pem
           chmod 600 ssh_key.pem
 
 
