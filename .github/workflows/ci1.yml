@@ -89,17 +89,34 @@ jobs:
       # Instalar Syft para SBOM
       - name: Instalar Syft
         run: |
-          SYFT_VERSION=$(curl -fsSL https://api.github.com/repos/anchore/syft/releases/latest | jq -r .tag_name)
+          set -e
 
+          sudo apt-get update -y
+          sudo apt-get install -y jq
+          # Obtener tag más reciente (ej: v1.14.0)
+          SYFT_VERSION=$(curl -fsSL https://api.github.com/repos/anchore/syft/releases/latest | jq -r .tag_name)
+          echo "Versión de Syft: $SYFT_VERSION"
+          # Obtener URLs REALES del release
+          ASSET_URL=$(curl -fsSL https://api.github.com/repos/anchore/syft/releases/latest \
+            | jq -r '.assets[] | select(.name | test("linux_amd64.*\\.tar\\.gz$")) | .browser_download_url')
+
+          CHECKSUM_URL=$(curl -fsSL https://api.github.com/repos/anchore/syft/releases/latest \
+            | jq -r '.assets[] | select(.name | test("linux_amd64.*\\.tar\\.gz\\.sha256$")) | .browser_download_url')
+
+          echo "Asset TAR.GZ: $ASSET_URL"
+          echo "Checksum: $CHECKSUM_URL"
           # Descargar binario + checksum
-          curl -fsSL -o syft.tar.gz "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/syft_${SYFT_VERSION#v}_linux_amd64.tar.gz"
-          curl -fsSL -o syft.tar.gz.sha256 "https://github.com/anchore/syft/releases/download/${SYFT_VERSION}/syft_${SYFT_VERSION#v}_linux_amd64.tar.gz.sha256"
+          curl -fsSL -o syft.tar.gz "$ASSET_URL"
+          curl -fsSL -o syft.tar.gz.sha256 "$CHECKSUM_URL"
 
           # Verificar integridad
           sha256sum --check syft.tar.gz.sha256
 
-          # Instalar
-          sudo tar -xzf syft.tar.gz -C /usr/local/bin syft
+          # Instalar Syft
+          sudo tar -xzf syft.tar.gz -C /usr/local/bin syft || \
+            sudo tar -xzf syft.tar.gz -C /usr/local/bin --wildcards 'syft*'
+
+          echo "Syft instalado correctamente."
 
       # Generar SBOM desde la imagen Docker
       - name: Generar SBOM con Syft
