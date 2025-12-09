@@ -93,24 +93,28 @@ jobs:
 
           sudo apt-get update -y
           sudo apt-get install -y jq
-          # Obtener tag más reciente (ej: v1.14.0)
+
+          # Obtener tag más reciente (ej: v1.38.0)
           SYFT_VERSION=$(curl -fsSL https://api.github.com/repos/anchore/syft/releases/latest | jq -r .tag_name)
-          echo "Versión de Syft: $SYFT_VERSION"
-          # Obtener URLs REALES del release
+          echo "Versión: $SYFT_VERSION"
+
+          # Obtener asset TAR.GZ correcto
           ASSET_URL=$(curl -fsSL https://api.github.com/repos/anchore/syft/releases/latest \
             | jq -r '.assets[] | select(.name | test("linux_amd64.*\\.tar\\.gz$")) | .browser_download_url')
 
-          CHECKSUM_URL=$(curl -fsSL https://api.github.com/repos/anchore/syft/releases/latest \
-            | jq -r '.assets[] | select(.name | test("linux_amd64.*\\.tar\\.gz\\.sha256$")) | .browser_download_url')
+          # Obtener archivo de checksums (termina en "_checksums.txt")
+          CHECKSUMS_URL=$(curl -fsSL https://api.github.com/repos/anchore/syft/releases/latest \
+            | jq -r '.assets[] | select(.name | test("checksums.txt$")) | .browser_download_url')
 
-          echo "Asset TAR.GZ: $ASSET_URL"
-          echo "Checksum: $CHECKSUM_URL"
-          # Descargar binario + checksum
+          echo "Descargando: $ASSET_URL"
+          echo "Checksums: $CHECKSUMS_URL"
+
           curl -fsSL -o syft.tar.gz "$ASSET_URL"
-          curl -fsSL -o syft.tar.gz.sha256 "$CHECKSUM_URL"
+          curl -fsSL -o checksums.txt "$CHECKSUMS_URL"
 
           # Verificar integridad
-          sha256sum --check syft.tar.gz.sha256
+          FILE_NAME=$(basename "$ASSET_URL")
+          grep "$FILE_NAME" checksums.txt | sha256sum --check - || { echo "Checksum inválido"; exit 1; }
 
           # Instalar Syft
           sudo tar -xzf syft.tar.gz -C /usr/local/bin syft || \
