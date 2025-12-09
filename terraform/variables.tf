@@ -51,3 +51,8 @@ variable "assign_public_ip" {
   default     = true
   description = "Asignar IP pública a la instancia EC2"
 }
+
+variable "ssh_open_world" {
+  type        = bool
+  default     = false
+}
