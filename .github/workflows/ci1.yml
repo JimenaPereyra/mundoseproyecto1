@@ -94,31 +94,31 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y jq
 
-          # Obtener tag más reciente (ej: v1.38.0)
-          SYFT_VERSION=$(curl -fsSL https://api.github.com/repos/anchore/syft/releases/latest | jq -r .tag_name)
-          echo "Versión: $SYFT_VERSION"
+          # Último release
+          RELEASE=$(curl -fsSL https://api.github.com/repos/anchore/syft/releases/latest)
+          SYFT_VERSION=$(echo "$RELEASE" | jq -r .tag_name)
 
           # Obtener asset TAR.GZ correcto
-          ASSET_URL=$(curl -fsSL https://api.github.com/repos/anchore/syft/releases/latest \
-            | jq -r '.assets[] | select(.name | test("linux_amd64.*\\.tar\\.gz$")) | .browser_download_url')
+          ASSET_URL=$(echo "$RELEASE" | jq -r '.assets[] | select(.name | test("linux_amd64.*\\.tar\\.gz$")) | .browser_download_url')
 
-          # Obtener archivo de checksums (termina en "_checksums.txt")
-          CHECKSUMS_URL=$(curl -fsSL https://api.github.com/repos/anchore/syft/releases/latest \
-            | jq -r '.assets[] | select(.name | test("checksums.txt$")) | .browser_download_url')
+          # Obtener checksums
+          CHECKSUMS_URL=$(echo "$RELEASE" | jq -r '.assets[] | select(.name | test("checksums.txt$")) | .browser_download_url')
 
           echo "Descargando: $ASSET_URL"
           echo "Checksums: $CHECKSUMS_URL"
 
-          curl -fsSL -o syft.tar.gz "$ASSET_URL"
+          # Archivo con nombre original
+          FILE_NAME=$(basename "$ASSET_URL")
+
+          curl -fsSL -o "$FILE_NAME" "$ASSET_URL"
           curl -fsSL -o checksums.txt "$CHECKSUMS_URL"
 
-          # Verificar integridad
-          FILE_NAME=$(basename "$ASSET_URL")
-          grep "$FILE_NAME" checksums.txt | sha256sum --check - || { echo "Checksum inválido"; exit 1; }
+          # Verificar checksum
+          grep "$FILE_NAME" checksums.txt | sha256sum --check -
 
           # Instalar Syft
-          sudo tar -xzf syft.tar.gz -C /usr/local/bin syft || \
-            sudo tar -xzf syft.tar.gz -C /usr/local/bin --wildcards 'syft*'
+          sudo tar -xzf "$FILE_NAME" -C /usr/local/bin syft || \
+          sudo tar -xzf "$FILE_NAME" -C /usr/local/bin --wildcards 'syft*'
 
           echo "Syft instalado correctamente."
 
