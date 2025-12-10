@@ -214,6 +214,7 @@ jobs:
 
       - name: Obtener SG creado por Terraform
         id: sg
+        working-directory: ./terraform
         run: |
           SG_ID=$(terraform output -raw ec2_security_group_id)
           echo "SG_ID=$SG_ID" >> $GITHUB_ENV
