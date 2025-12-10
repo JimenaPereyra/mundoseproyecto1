@@ -1,3 +1,4 @@
+
 name: CI/CD - App Clima2
 
 permissions:
@@ -210,6 +211,30 @@ jobs:
         with:
           name: terraform-outputs
           path: tf_outputs.json
+
+      - name: Add temporary GitHub Runner IP to security group
+        run: |
+          SG_ID=$(aws ec2 describe-instances \
+            --instance-ids $EC2_INSTANCE_ID \
+            --query "Reservations[0].Instances[0].SecurityGroups[0].GroupId" \
+            --output text)
+
+          RUNNER_IP=$(curl -s https://checkip.amazonaws.com)
+
+          echo "Runner IP: $RUNNER_IP"
+          echo "Security Group: $SG_ID"
+
+          aws ec2 authorize-security-group-ingress \
+            --group-id "$SG_ID" \
+            --protocol tcp \
+            --port 22 \
+            --cidr "$RUNNER_IP/32"
+
+          echo "Temporary IP added."
+
+        env:
+          AWS_REGION: us-east-1
+
 
       - name: Wait for EC2 SSH to be ready
         run: |
