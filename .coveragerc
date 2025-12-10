@@ -1,0 +1,20 @@
+
+[run]
+# Hace que Coverage emita rutas relativas al repo (no /home/runner/work/...)
+relative_files = True
+
+# Como tu app es un único archivo en la raíz, medimos toda la raíz
+# (luego omitimos tests para que no entren)
+source = .
+
+[report]
+# Excluir los tests del reporte
+omit =
+    tests/*
+
+[paths]
+# Mapea rutas absolutas del runner a la raíz del proyecto,
+# por si Coverage llegara a incluirlas (defensa adicional).
+source =
+    .
+    /home/runner/work/mundoseproyecto1/mundoseproyecto1
