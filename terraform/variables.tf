@@ -52,12 +52,14 @@ variable "assign_public_ip" {
   description = "Asignar IP pública a la instancia EC2"
 }
 
-variable "ssh_open_world" {
-  type        = bool
-  default     = false
-}
+
 variable "ssh_allowed_ips" {
   description = "Lista de IPs autorizadas para acceder por SSH"
   type        = list(string)
-  default     = []
+  default     = [
+    "186.158.33.33/32",
+    "186.122.224.209/32",
+    "200.127.60.69/32",
+    "190.11.151.93/32"
+]
 }
