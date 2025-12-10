@@ -46,8 +46,14 @@ resource "aws_security_group" "sg" {
   ingress {
     from_port = 22
     to_port   = 22
-    protocol  = "tcp"
-    cidr_blocks =  ["0.0.0.0/0"]   # Reemplazar por tu IP/32 en producción
+    protocol  = "tcp"  
+    cidr_blocks = [
+    "186.158.33.33/32",
+    "186.122.224.209/32",
+    "200.127.60.69/32",
+    "190.11.151.93/32"
+  ]
+   # Reemplazar por tu IP/32 en producción
   }
 
   egress {
