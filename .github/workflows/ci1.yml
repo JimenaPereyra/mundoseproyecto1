@@ -43,7 +43,7 @@ jobs:
       - name: Ejecutar tests con coverage
         run: |
          source .venv/bin/activate
-         python -m pytest --cov=app_clima2.py --cov-report=term --cov-report=xml:coverage.xml
+         python -m pytest --cov=app_clima2 --cov-report=term --cov-report=xml:coverage.xml
 
          # Verificación rápida (opcional)
          head -n 40 coverage.xml || true
