@@ -5,7 +5,7 @@ relative_files = True
 
 # Como tu app es un único archivo en la raíz, medimos toda la raíz
 # (luego omitimos tests para que no entren)
-source = .
+source = app_clima2
 
 [report]
 # Excluir los tests del reporte
