@@ -212,14 +212,17 @@ jobs:
           name: terraform-outputs
           path: tf_outputs.json
 
+      - name: Obtener SG creado por Terraform
+        id: sg
+        run: |
+          SG_ID=$(terraform output -raw ec2_security_group_id)
+          echo "SG_ID=$SG_ID" >> $GITHUB_ENV
+          echo "Security Group obtenido: $SG_ID"
+
       - name: Add temporary GitHub Runner IP to security group
         run: |
-          SG_ID=$(aws ec2 describe-instances \
-            --instance-ids $EC2_INSTANCE_ID \
-            --query "Reservations[0].Instances[0].SecurityGroups[0].GroupId" \
-            --output text)
 
-          RUNNER_IP=$(curl -s https://checkip.amazonaws.com)
+          RUNNER_IP=$(curl -s https://api.ipify.org)
 
           echo "Runner IP: $RUNNER_IP"
           echo "Security Group: $SG_ID"
