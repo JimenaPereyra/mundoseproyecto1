@@ -44,7 +44,7 @@ jobs:
         run: |
          source .venv/bin/activate
          coverage run -m pytest --cov=.
-         coverage xml --relative-source
+         coverage xml -i
       - name: Agrego TAG
         id: set-tag
         run: |
