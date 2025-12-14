@@ -5,7 +5,11 @@ Aplicación web de consulta de clima desarrollada en **Python + Flask**, que con
 La solución está **containerizada con Docker**, cuenta con **observabilidad completa (Prometheus + Grafana)**, **CI/CD automatizado con GitHub Actions**, análisis de **calidad y seguridad**, y **despliegue automático en AWS EC2 mediante Terraform**.
 
 ---
+## 🎥 Demo de la aplicación
 
+https://github.com/JimenaPereyra/mundoseproyecto1/blob/main/docs/video/Demo%20App_clima(1).mp4
+
+---
 ## ✨ Características principales
 
 - 🌍 Consulta de clima por ciudad usando **OpenWeather API**
