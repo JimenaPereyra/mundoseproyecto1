@@ -7,7 +7,8 @@ La solución está **containerizada con Docker**, cuenta con **observabilidad co
 ---
 ## 🎥 Demo de la aplicación
 
-https://github.com/JimenaPereyra/mundoseproyecto1/blob/main/docs/video/Demo%20App_clima(1).mp4
+https://github.com/user-attachments/assets/d381b1e9-14b3-441e-8147-a8b3b95de37d
+
 
 ---
 ## ✨ Características principales
