@@ -1,196 +1,265 @@
-Aplicación del Clima — README
-Este repositorio contiene el código fuente de una aplicación web de clima desarrollada en Python usando Flask, que consulta la API de OpenWeatherMap para obtener información meteorológica en tiempo real. 
-Se encuentra containerizada con Docker, desplegada automáticamente en AWS EC2 mediante Terraform y con un pipeline CI/CD en GitHub Actions que incorpora calidad, seguridad y observabilidad.
-________________________________________
+# 🌦️ Aplicación del Clima — App Clima2
 
-Características Principales:
-•	Consulta de clima por ciudad utilizando la API de OpenWeather.
-•	Métricas expuestas en /metrics para Prometheus.
-•	Dashboard de observabilidad preconfigurado en Grafana.
-•	Tests automatizados con pytest y cobertura (pytest-cov)
-•	Análisis de calidad de código con SonarCloud.
-•	Análisis de seguridad de imágenes Docker con Snyk.
-•	Generación de SBOM (CycloneDX) con Syft.
-•	CI/CD completo con build, test, scan, push y deploy automático.  
+Aplicación web de consulta de clima desarrollada en **Python + Flask**, que consume la API de **OpenWeatherMap** para obtener información meteorológica en tiempo real.
 
-Requisitos previos
-Para poder usar y ejecutar este proyecto correctamente, necesitás contar con:
-✔️ 1. Cuenta en OpenWeatherMap
-La aplicación usa la API pública de OpenWeatherMap. Debés obtener una API Key desde: https://openweathermap.org/api
-Luego, configurar la key como variable de entorno:
+La solución está **containerizada con Docker**, cuenta con **observabilidad completa (Prometheus + Grafana)**, **CI/CD automatizado con GitHub Actions**, análisis de **calidad y seguridad**, y **despliegue automático en AWS EC2 mediante Terraform**.
+
+---
+
+## ✨ Características principales
+
+- 🌍 Consulta de clima por ciudad usando **OpenWeather API**
+- ⚡ Cache en memoria con TTL configurable
+- 📈 Métricas expuestas en `/metrics` para **Prometheus**
+- 📊 Dashboard de observabilidad preconfigurado en **Grafana**
+- 🧪 Tests automatizados con **pytest** y **coverage**
+- 🔍 Análisis de calidad de código con **SonarCloud**
+- 🛡️ Análisis de seguridad de imágenes Docker con **Snyk**
+- 📦 Generación de **SBOM (CycloneDX)** con **Syft**
+- 🔄 CI/CD completo: build, test, scan, push y deploy automático
+
+---
+
+## ✅ Requisitos previos
+
+### 🌦️ OpenWeatherMap
+
+- Crear cuenta en: https://openweathermap.org/api
+- Generar una **API Key**
+
+Variable requerida:
+```bash
 WEATHER_API_KEY="tu_api_key"
-O almacenarla en las GitHub Secrets (recomendado).
-✔️ 2. Se requiere una cuenta activa de AWS.
- Crear un Key Pair en AWS EC2 (ej: proyectofinal)
-Generar clave SSH localmente
-Credenciales necesarias (Github Secrets):
-AWS_ACCESS_KEY_ID   (Access Key del usuario IAM).
-AWS_SECRET_ACCESS_KEY  (Secret Key del usuario IAM)
-AWS_REGION  (Región AWS (ej: us-east-1))
-EC2_SSH_PRIVATE_KEY  (Clave privada SSH (PEM))
-SSH_PUBLIC_KEY (Clave pública SSH).
-✔️ 3. Se requiere una cuenta en SonarCloud.
-Se puede iniciar sesión con GitHub, crear la organización y generar token de análisis.
-Secret Requerido: 
-SONAR_TOKEN  (Token de SonarCloud)
+```
 
-✔️ 4. Se requiere una cuenta en Snyk.
-Se crea la cuenta en https://snyk.io y se genera el token.
-Secret requerido:
-SNYK_TOKEN (Token de Snyk)
-✔️ 5. Docker Hub .
-Utilizamos dockerhub para publicar la imagen.
-Secrets requeridos: 
-DOCKERHUB_USERNAME (Usuario DockerHub)
-DOCKERHUB_TOKEN (Access Token Docker Hub)
+---
 
-________________________________________
-Estructura del proyecto
-El repositorio contiene:
+### ☁️ AWS (Deploy)
+
+Se requiere una **cuenta activa de AWS**.
+
+Configuración necesaria:
+- Usuario IAM con permisos sobre EC2, VPC y Security Groups
+- Key Pair para EC2 (ej: `proyectofinal`)
+- Claves SSH
+
+**GitHub Secrets requeridos:**
+
+| Secret | Descripción |
+|------|-------------|
+| `AWS_ACCESS_KEY_ID` | Access Key del usuario IAM |
+| `AWS_SECRET_ACCESS_KEY` | Secret Key del usuario IAM |
+| `AWS_REGION` | Región AWS (ej: `us-east-1`) |
+| `EC2_SSH_PRIVATE_KEY` | Clave privada SSH (PEM) |
+| `SSH_PUBLIC_KEY` | Clave pública SSH |
+
+---
+
+### 🔍 SonarCloud
+
+- Iniciar sesión con GitHub
+- Crear organización
+- Generar token
+
+**Secret requerido:**
+- `SONAR_TOKEN`
+
+---
+
+### 🛡️ Snyk
+
+- Crear cuenta en https://snyk.io
+- Generar API Token
+
+**Secret requerido:**
+- `SNYK_TOKEN`
+
+---
+
+### 🐳 Docker Hub
+
+Se utiliza para publicar la imagen Docker.
+
+**Secrets requeridos:**
+- `DOCKERHUB_USERNAME`
+- `DOCKERHUB_TOKEN`
+
+---
+
+## 📁 Estructura del proyecto
+
+```
 .
-├── app_clima2.py          # Aplicación principal Flask
-├── templates/             # index HTML 
-├── static/                # Estilo de la aplicacion
-├── tests/                 # Pruebas automatizadas con pytest
-├── prometheus/            # Configuracion de prometheus
-├── grafana/               # Configuracion de grafana
-├── Dockerfile             # Construcción de la imagen Docker
-├── Docker-compose.yml     # Orquestacion de app + prometheus + grafana
-├── requirements.txt       # Dependencias de producción
-├── requirements-dev.txt   # Dependencias de desarrollo y testing
-├── sonar-project.properties # Configuración para SonarCloud
-├── terraform/             # Infraestructura como código (si aplica)
+├── app_clima2.py              # Aplicación principal Flask
+├── docker-compose.yml         # App + Prometheus + Grafana
+├── Dockerfile                 # Imagen Docker
+├── requirements.txt           # Dependencias de producción
+├── requirements-dev.txt       # Dependencias de desarrollo/testing
+├── sonar-project.properties   # Configuración SonarCloud
+├── tests/                     # Tests automatizados
+│   └── test_app.py
+├── templates/                 # Templates HTML
+│   └── index.html
+├── static/                    # CSS
+│   └── estilo.css
+├── prometheus/                # Configuración Prometheus
+│   └── prometheus.yml
+├── grafana/                   # Configuración Grafana
+│   ├── datasources/
+│   │   └── datasources.yml
+│   └── dashboards/
+│       ├── dashboard.yml
+│       └── dashboard.json
+├── terraform/                 # Infraestructura AWS
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── providers.tf
+│   └── outputs.tf
 └── README.md
+```
 
-terraform/ # Infraestructura como código (AWS)
- ├── main.tf
- ├── variables.tf
- ├── providers.tf
- └── outputs.tf
+---
 
+## 🚀 Endpoints de la aplicación
 
-grafana/ # Configuración Grafana
- ├── datasources/
- │    └── datasources.yml
- └── dashboards/
-      ├── dashboard.yml
-      └── dashboard.json
+| Endpoint | Método | Descripción |
+|--------|--------|-------------|
+| `/` | GET | Interfaz web HTML |
+| `/clima?ciudad=` | GET | Devuelve clima de la ciudad |
+| `/health` | GET | Healthcheck |
+| `/metrics` | GET | Métricas Prometheus |
 
+---
 
-prometheus/ # Configuración Prometheus
- └── prometheus.yml
+## 🔄 CI/CD Pipeline
 
+**Pipeline:** `CI/CD - App Clima2`
 
-________________________________________
-Versiones y dependencias
-   Versiones utilizadas
-•	Python: 3.x (recomendado 3.10+)
-•	Flask: 3.1.2
-•	Requests: 2.31.0
-•	Flask-WTF: 1.2.2
-•	Pytest: 8.4.2
-•	Pytest-cov: 5.0.0
-•	Coverage: última versión estable
-Dependencias
-Producción – requirements.txt
-Flask==3.1.2
-requests==2.31.0
-Flask-WTF==1.2.2
-Desarrollo / Testing – requirements-dev.txt
-pytest==8.4.2
-pytest-cov==5.0.0
-coverage
-Instalación recomendada:
-pip install -r requirements.txt
-pip install -r requirements-dev.txt
-________________________________________
-Endpoints de la aplicación
-Endpoint	Método	Descripción
-/	GET	Interfaz web HTML
-/clima?ciudad=	GET	Devuelve clima de la ciudad
-/health	GET	Healthcheck de la app
-/metrics	GET	Métricas Prometheus
-________________________________________
-CI/CD Pipeline
-Pipeline: CI/CD - App Clima2
-Etapas
-1.	Checkout del código
-2.	Setup Python 3.12
-3.	Instalación de dependencias
-4.	Tests + Coverage
-5.	SonarCloud Scan
-6.	Build & Push Docker Image
-7.	SBOM con Syft
-8.	Security Scan con Snyk
-9.	Deploy automático en AWS con Terraform
-El deploy se ejecuta únicamente sobre la rama main.
-________________________________________
+### Etapas
 
-Docker
-Dockerfile
-•	Imagen base: python:3.12-slim
-•	Usuario no-root
-•	Puerto expuesto: 5000
-Docker Compose
+1. 📥 Checkout del código
+2. 🐍 Setup Python 3.12
+3. 📦 Instalación de dependencias
+4. 🧪 Tests + Coverage
+5. 🔍 SonarCloud Scan
+6. 🐳 Build & Push Docker Image
+7. 📦 SBOM con Syft
+8. 🛡️ Security Scan con Snyk
+9. ☁️ Deploy automático en AWS con Terraform
+
+📌 El deploy se ejecuta únicamente sobre la rama **main**.
+
+---
+
+## 🐳 Docker
+
+### Dockerfile
+- Imagen base: `python:3.12-slim`
+- Usuario no-root
+- Puerto expuesto: `5000`
+
+### Docker Compose
 Servicios incluidos:
-•	app_clima
-•	prometheus
-•	grafana
-________________________________________
-Testing
-Los tests están ubicados en la carpeta tests/.
-Los tests están implementados con pytest y cubren:
-•	Casos exitosos y errores del endpoint /clima
-•	Cache hit
-•	Healthcheck
-•	Métricas Prometheus
-•	Home page
-________________________________________
-Integración con SonarCloud
-El proyecto incluye un archivo sonar-project.properties con:
-sonar.projectKey=JimenaPereyra_mundoseproyecto1
-sonar.organization=jimenapereyra
-sonar.host.url=https://sonarcloud.io
+- `app_clima`
+- `prometheus`
+- `grafana`
 
-# Código fuente
-sonar.sources=.
-sonar.exclusions=tests/**
+Levantar entorno local:
+```bash
+docker compose up -d --build
+```
 
-# Tests
-sonar.tests=tests
-sonar.test.inclusions=tests/**/*.py
-sonar.python.coverage.reportPaths=coverage.xml
+---
 
-# Exclusiones recomendadas
-sonar.exclusions=**/.venv/**,**/venv/**,**/__pycache__/**
-________________________________________
-Infraestructura (Terraform)
-La gestión de infraestructura se realiza con Terraform.
-Es necesario tener instalado: - Terraform - Credenciales para el proveedor en uso (AWS / GCP / Azure según la configuración del proyecto)
-Comandos básicos:
+## 🧪 Testing
+
+Los tests se encuentran en la carpeta `tests/` y cubren:
+
+- ✔️ Casos exitosos y errores del endpoint `/clima`
+- ✔️ Cache hit
+- ✔️ Healthcheck
+- ✔️ Métricas Prometheus
+- ✔️ Home page
+
+Ejecutar tests localmente:
+```bash
+pytest --cov=app_clima2 --cov-report=term
+```
+
+---
+
+## ☁️ Infraestructura como Código (Terraform)
+
+La infraestructura se gestiona mediante **Terraform**, permitiendo un despliegue reproducible y automatizado en **AWS EC2**.
+
+### Recursos aprovisionados
+
+- Instancia EC2
+- Security Groups (puertos 22, 5000, 3000, 9090)
+- Key Pair SSH
+- Variables y outputs configurables
+
+### Requisitos
+
+- Terraform instalado (`>= 1.6`)
+- Credenciales AWS configuradas (IAM)
+
+### Comandos básicos
+
+```bash
 terraform init
 terraform plan
 terraform apply
-________________________________________
-Observabilidad 
-Prometheus
-•	Scrapea métricas cada 15 segundos
-•	Target: app_clima:5000/metrics
-Métricas expuestas
-•	Requests totales y por endpoint
-•	Latencia de requests (P95)
-•	Latencia API OpenWeather
-•	Cache hits / misses
-•	Ciudad más consultada
-•	Payload size
-•	Healthchecks ejecutados
-Grafana
-•	Datasource auto-provisionado
-•	Dashboard incluido: Clima App - Observabilidad
-•	Acceso por defecto: http://localhost:3000
+```
 
+📌 El deploy se ejecuta automáticamente desde el pipeline **solo en la rama `main`**.
 
+---
 
+## 📊 Observabilidad
 
+### Prometheus
+- Scrapea métricas cada 15 segundos
+- Target: `app_clima:5000/metrics`
 
+### Grafana
+- Datasource auto-provisionado
+- Dashboard incluido: **Clima App - Observabilidad**
+- Acceso por defecto: http://localhost:3000
 
+---
+
+## 🧰 Versiones y dependencias
+
+### Versiones utilizadas
+
+| Componente | Versión |
+|----------|---------|
+| Python | 3.12 |
+| Flask | 3.1.2 |
+| Requests | 2.31.0 |
+| Flask-WTF | 1.2.2 |
+| Pytest | 8.4.2 |
+| Pytest-cov | 5.0.0 |
+| Coverage | Última versión estable |
+| Docker | 24.x+ |
+| Docker Compose | v2 |
+| Terraform | 1.6+ |
+
+### Dependencias
+
+**Producción – `requirements.txt`**
+```txt
+Flask==3.1.2
+requests==2.31.0
+Flask-WTF==1.2.2
+```
+
+**Desarrollo / Testing – `requirements-dev.txt`**
+```txt
+pytest==8.4.2
+pytest-cov==5.0.0
+coverage
+```
+
+---
