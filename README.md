@@ -14,7 +14,6 @@ https://github.com/user-attachments/assets/d381b1e9-14b3-441e-8147-a8b3b95de37d
 ## ✨ Características principales
 
 - 🌍 Consulta de clima por ciudad usando **OpenWeather API**
-- ⚡ Cache en memoria con TTL configurable
 - 📈 Métricas expuestas en `/metrics` para **Prometheus**
 - 📊 Dashboard de observabilidad preconfigurado en **Grafana**
 - 🧪 Tests automatizados con **pytest** y **coverage**
