@@ -95,7 +95,7 @@ Se utiliza para publicar la imagen Docker.
 
 ```
 .
-├── app_clima2.py              # Aplicación principal Flask
+├── app_clima2.py              # Aplicación principal Python - Flask 
 ├── docker-compose.yml         # App + Prometheus + Grafana
 ├── Dockerfile                 # Imagen Docker
 ├── requirements.txt           # Dependencias de producción
