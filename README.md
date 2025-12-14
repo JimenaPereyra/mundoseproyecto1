@@ -20,7 +20,7 @@ https://github.com/user-attachments/assets/d381b1e9-14b3-441e-8147-a8b3b95de37d
 - 🔍 Análisis de calidad de código con **SonarCloud**
 - 🛡️ Análisis de seguridad de imágenes Docker con **Snyk**
 - 📦 Generación de **SBOM (CycloneDX)** con **Syft**
-- 🔄 CI/CD completo: build, test, scan, push y deploy automático
+- 🔄 CI/CD completo: build, test, scan, push y deploy automático.
 
 ---
 
