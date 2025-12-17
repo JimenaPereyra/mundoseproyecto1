@@ -92,9 +92,11 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
       - name: Export Docker image
+        env:
+         DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
         run: |
           docker save \
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
+            ${DOCKER_USER}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
             -o app_clima2_${{ env.IMAGE_TAG }}.tar
 
       - name: Upload Docker image artifact
