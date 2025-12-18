@@ -92,6 +92,7 @@ Se utiliza para publicar la imagen Docker.
 Para descargar la imagen desde Docker Hub y generar el .tar se puede realizar lo siguiente:
 
 **Pull de la imagen desde Doker Hub**
+
 ```bash
 
 docker pull jimepereyra/app_clima2:<TAG>
