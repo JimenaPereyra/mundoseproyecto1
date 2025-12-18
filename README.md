@@ -1,5 +1,7 @@
 # 🌦️ Aplicación del Clima — App Clima2
 
+Este repositorio aloja la automatización del ciclo de vida de desarrollo (CI/CD) y la infraestructura necesaria para desplegar la aplicacion.
+
 Aplicación web de consulta de clima desarrollada en **Python + Flask**, que consume la API de **OpenWeatherMap** para obtener información meteorológica en tiempo real.
 
 La solución está **containerizada con Docker**, cuenta con **observabilidad completa (Prometheus + Grafana)**, **CI/CD automatizado con GitHub Actions**, análisis de **calidad y seguridad**, y **despliegue automático en AWS EC2 mediante Terraform**.
@@ -18,9 +20,13 @@ https://github.com/user-attachments/assets/d381b1e9-14b3-441e-8147-a8b3b95de37d
 - 📊 Dashboard de observabilidad preconfigurado en **Grafana**
 - 🧪 Tests automatizados con **pytest** y **coverage**
 - 🔍 Análisis de calidad de código con **SonarCloud**
+- 🐳 Generación de imagen de la aplicacion con push a  **Docker Hub**
 - 🛡️ Análisis de seguridad de imágenes Docker con **Snyk**
-- 📦 Generación de **SBOM (CycloneDX)** con **Syft**
+- 📦 Generación de **SBOM (CycloneDX)** con **Syft** 
+- ☁️ IaC con **Terraform**
 - 🔄 CI/CD completo: build, test, scan, push y deploy automático.
+
+
 
 ---
 
@@ -47,6 +53,7 @@ Configuración necesaria:
 - Usuario IAM con permisos sobre EC2, VPC y Security Groups
 - Key Pair para EC2 (ej: `proyectofinal`)
 - Claves SSH
+
 
 **GitHub Secrets requeridos:**
 
@@ -174,15 +181,15 @@ docker run -d -p 5000:5000 jimepereyra/app_clima2:<TAG>
 
 ### Etapas
 
-1. 📥 Checkout del código
+1. 📥 Checkout del código: Clona el código del repositorio en el runner.
 2. 🐍 Setup Python 3.12
 3. 📦 Instalación de dependencias
-4. 🧪 Tests + Coverage
-5. 🔍 SonarCloud Scan
-6. 🐳 Build & Push Docker Image
-7. 📦 SBOM con Syft
-8. 🛡️ Security Scan con Snyk
-9. ☁️ Deploy automático en AWS con Terraform
+4. 🧪 Tests + Coverage: Ejecutar test con coverage 
+5. 🔍 SonarCloud Scan: Análisis estático para detectar vulnerabilidades.
+6. 🐳 Build & Push Docker Image: Construye la imagen y la publica en Docker Hub.
+7. 📦 SBOM con Syft: Generacion de SBOM (Software Bill of Materials))
+8. 🛡️ Security Scan con Snyk: Escaneo de vulnerabilidades. (Severity threshold: High)
+9. ☁️ Deploy automático en AWS con Terraform: Planificación y aplicación de cambios en AWS. Provisionamiento de una instancia EC2.
 
 📌 El deploy se ejecuta únicamente sobre la rama **main**.
 
@@ -216,7 +223,7 @@ Los tests se encuentran en la carpeta `tests/` y cubren:
 - ✔️ Cache hit
 - ✔️ Healthcheck
 - ✔️ Métricas Prometheus
-- ✔️ Home page
+
 
 Ejecutar tests localmente:
 ```bash
@@ -235,6 +242,8 @@ La infraestructura se gestiona mediante **Terraform**, permitiendo un despliegue
 - Security Groups (puertos 22, 5000, 3000, 9090)
 - Key Pair SSH
 - Variables y outputs configurables
+- Gestion dinámica de Security Groups (permite acceso temporal a la IP del runner de GitHub para SSH).
+
 
 ### Requisitos
 
@@ -249,6 +258,17 @@ terraform plan
 terraform apply
 ```
 
+### Configuración de la EC2:
+- Instalaión automática de dependencias (Docker, Docker Compose, Git) via SSH.
+
+### Despliegue de la Aplicación:
+
+- Clonado del repositorio en EC2.
+- Ejecución medante docker compose.
+
+- Acceso: http://<IP_Publica_EC2>:5000
+
+
 📌 El deploy se ejecuta automáticamente desde el pipeline **solo en la rama `main`**.
 
 ---
@@ -257,15 +277,29 @@ terraform apply
 
 ### Prometheus
 - Scrapea métricas cada 15 segundos
+- Acceso por defecto:  http://<IP_Publica_EC2>:9090
 - Target: `app_clima:5000/metrics`
 
 ### Grafana
 - Datasource auto-provisionado
 - Dashboard incluido: **Clima App - Observabilidad**
-- Acceso por defecto: http://localhost:3000
+- Acceso por defecto: http://<IP_Publica_EC2>:3000
+
+#### Dashboard
+
+El dashboard permite visualizar en tiempo real:
+- •	Tráfico: Total de requests y consultas por ciudad.
+- •	Rendimiento: Latencia por endpoint (P95) y tiempos de respuesta de la API externa (OpenWeather).
+- •	Eficiencia: Tasa de Cache Hits vs Cache Misses.
+- •	Negocio: Ciudad más consultada y última temperatura registrada.
+- •	Salud: Healthchecks ejecutados.
+- •	Status de la app: UP/DOWN.
+- •	Rendimiento del Hardware: Uso de CPU y Memoria.
+- •	Errores por minuto: Contador de errores.
+
 
 ---
-
+ 
 ## 🧰 Versiones y dependencias
 
 ### Versiones utilizadas
