@@ -88,6 +88,22 @@ Se utiliza para publicar la imagen Docker.
 - `DOCKERHUB_USERNAME`
 - `DOCKERHUB_TOKEN`
 
+Para descargar la imagen desde Docker Hub y generar el .tar se puede realizar lo siguiente:
+
+**Pull de la imagen desde Doker Hub**
+docker pull jimenapereyra/app_clima2:58fbd009
+
+**Exportar la imagen a un .tar**
+docker save jimepereyra/app_clima2:58fbd009 -o app_clima2_58fbd009.tar
+
+En el pipeline se esta generando el artifact .tar
+
+Con ello puede hacer:
+docker load -i app_clima2_3f9a21c4.tar
+docker run -d -p 8000:8000 app_clima2:3f9a21c4
+
+
+
 ---
 
 ## 📁 Estructura del proyecto
