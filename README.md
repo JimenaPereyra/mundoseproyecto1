@@ -95,18 +95,29 @@ Para descargar la imagen desde Docker Hub y generar el .tar se puede realizar lo
 
 ```bash
 
+
 docker pull jimepereyra/app_clima2:<TAG>
 ```
 
 **Exportar la imagen a un .tar**
+```bash
 
-docker save jimepereyra/app_clima2:58fbd009 -o app_clima2_<TAG>.tar
+docker save jimepereyra/app_clima2:<TAG> -o app_clima2_<TAG>.tar
+```
+
 
 En el pipeline se esta generando el artifact .tar
 
 Con ello puede hacer:
+```bash
+
 docker load -i app_clima2_<TAG>.tar
-docker run -d -p 8000:8000 jimepereyra/app_clima2:<TAG>
+```
+
+```bash
+
+docker run -d -p 5000:5000 jimepereyra/app_clima2:<TAG>
+```
 
 
 
