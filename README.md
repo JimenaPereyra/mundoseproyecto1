@@ -94,7 +94,7 @@ Para descargar la imagen desde Docker Hub y generar el .tar se puede realizar lo
 **Pull de la imagen desde Doker Hub**
 ```bash
 
-docker pull jimenapereyra/app_clima2:58fbd009
+docker pull jimepereyra/app_clima2:<TAG>
 ```
 
 **Exportar la imagen a un .tar**
