@@ -33,6 +33,7 @@ https://github.com/user-attachments/assets/d381b1e9-14b3-441e-8147-a8b3b95de37d
 
 Variable requerida:
 ```bash
+
 WEATHER_API_KEY="tu_api_key"
 ```
 
@@ -91,16 +92,20 @@ Se utiliza para publicar la imagen Docker.
 Para descargar la imagen desde Docker Hub y generar el .tar se puede realizar lo siguiente:
 
 **Pull de la imagen desde Doker Hub**
+```bash
+
 docker pull jimenapereyra/app_clima2:58fbd009
+```
 
 **Exportar la imagen a un .tar**
-docker save jimepereyra/app_clima2:58fbd009 -o app_clima2_58fbd009.tar
+
+docker save jimepereyra/app_clima2:58fbd009 -o app_clima2_<TAG>.tar
 
 En el pipeline se esta generando el artifact .tar
 
 Con ello puede hacer:
-docker load -i app_clima2_3f9a21c4.tar
-docker run -d -p 8000:8000 app_clima2:3f9a21c4
+docker load -i app_clima2_<TAG>.tar
+docker run -d -p 8000:8000 jimepereyra/app_clima2:<TAG>
 
 
 
