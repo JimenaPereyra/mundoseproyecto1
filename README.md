@@ -1,6 +1,6 @@
 # 🌦️ Aplicación del Clima — App Clima2
 
-Este repositorio aloja la automatización del ciclo de vida de desarrollo (CI/CD) y la infraestructura necesaria para desplegar la aplicacion.
+Este repositorio aloja la automatización del ciclo de vida de desarrollo (CI/CD) y la infraestructura necesaria para desplegar la aplicación.
 
 Aplicación web de consulta de clima desarrollada en **Python + Flask**, que consume la API de **OpenWeatherMap** para obtener información meteorológica en tiempo real.
 
@@ -23,7 +23,7 @@ https://github.com/user-attachments/assets/d381b1e9-14b3-441e-8147-a8b3b95de37d
 - 🐳 Generación de imagen de la aplicacion con push a  **Docker Hub**
 - 🛡️ Análisis de seguridad de imágenes Docker con **Snyk**
 - 📦 Generación de **SBOM (CycloneDX)** con **Syft** 
-- ☁️ IaC con **Terraform**
+- ☁️ IaC con **Terraform**, desplegando la aplicacion en la infraestructura.
 - 🔄 CI/CD completo: build, test, scan, push y deploy automático.
 
 
@@ -42,6 +42,12 @@ Variable requerida:
 
 WEATHER_API_KEY="tu_api_key"
 ```
+
+**GitHub Secret requerida:**
+
+| Secret | Descripción |
+|------|-------------|
+| `WEATHER_API_KEY` | Api Key de la Api del Clima |
 
 ---
 
@@ -74,7 +80,10 @@ Configuración necesaria:
 - Generar token
 
 **Secret requerido:**
-- `SONAR_TOKEN`
+
+| Secret | Descripción |
+|------|-------------|
+| `SONAR_TOKEN` | Token de acceso a Sonar |
 
 ---
 
@@ -84,7 +93,13 @@ Configuración necesaria:
 - Generar API Token
 
 **Secret requerido:**
-- `SNYK_TOKEN`
+
+
+| Secret | Descripción |
+|------|-------------|
+| `SNYK_TOKEN` | Token para el acceso a Snyk |
+
+
 
 ---
 
@@ -93,8 +108,13 @@ Configuración necesaria:
 Se utiliza para publicar la imagen Docker.
 
 **Secrets requeridos:**
-- `DOCKERHUB_USERNAME`
-- `DOCKERHUB_TOKEN`
+
+| Secret | Descripción |
+|------|-------------|
+| `DOCKERHUB_USERNAME` | Credenciales para subir la imagen |
+| `DOCKERHUB_TOKEN` | Credenciales para subir la imagen |
+
+
 
 Para descargar la imagen desde Docker Hub y generar el .tar se puede realizar lo siguiente:
 
@@ -288,14 +308,14 @@ terraform apply
 #### Dashboard
 
 El dashboard permite visualizar en tiempo real:
-- •	Tráfico: Total de requests y consultas por ciudad.
-- •	Rendimiento: Latencia por endpoint (P95) y tiempos de respuesta de la API externa (OpenWeather).
-- •	Eficiencia: Tasa de Cache Hits vs Cache Misses.
-- •	Negocio: Ciudad más consultada y última temperatura registrada.
-- •	Salud: Healthchecks ejecutados.
-- •	Status de la app: UP/DOWN.
-- •	Rendimiento del Hardware: Uso de CPU y Memoria.
-- •	Errores por minuto: Contador de errores.
+- Tráfico: Total de requests y consultas por ciudad.
+- Rendimiento: Latencia por endpoint (P95) y tiempos de respuesta de la API externa (OpenWeather).
+- Eficiencia: Tasa de Cache Hits vs Cache Misses.
+- Negocio: Ciudad más consultada y última temperatura registrada.
+- Salud: Healthchecks ejecutados.
+- Status de la app: UP/DOWN.
+- Rendimiento del Hardware: Uso de CPU y Memoria.
+- Errores por minuto: Contador de errores.
 
 
 ---
